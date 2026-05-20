@@ -1,0 +1,77 @@
+auth-client-config (0.9ubuntu1) precise; urgency=low
+
+  * Build using dh_python2. LP: #904248.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 17 Dec 2011 21:32:53 +0000
+
+auth-client-config (0.9) intrepid; urgency=low
+
+  * update acc-default kerberos_example so it works better with kerberos
+    principals that have a local account with the same name. Thanks to
+    Adam Sommer and Steve Langasek.
+  * update ldap_example profile comments to mention that libpam-cracklib is
+    required
+  * update auth-client config to comment out sentinels required by Debian
+    and Ubuntu's pam-auth-update (LP: #270328)
+  * add tests for pam-auth-update specific tests
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 11 Jul 2008 17:05:37 -0400
+
+auth-client-config (0.8) intrepid; urgency=low
+
+  * allow for comma separated lists of types with '-t'
+  * bump version
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 13 Jun 2008 15:38:19 -0400
+
+auth-client-config (0.7) intrepid; urgency=low
+
+  * update cracklib profile to use pam_smbpass.so (LP: #208419)
+  * remove debconf dependency and usage (will add it back when needed)
+  * added NSS netgroup support (LP: #179919)
+  * bump version
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 11 Mar 2008 16:15:58 -0400
+
+auth-client-config (0.6) hardy; urgency=low
+
+  * use use RawConfigParser instead of SafeConfigParser (LP: #191990)
+  * update acc-default comments (LP: #191990)
+  * make more PEP-8 compliant (whitespace)
+  * debian/rules: update version with changelog version
+  * debian/control: use Vcs-Bzr url
+  * lintian fixes
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 21 Feb 2008 11:44:41 -0500
+
+auth-client-config (0.5) hardy; urgency=low
+
+  * new upstream release
+    - adds cracklib profile
+    - don't error out if other PAM entries don't exist, but this one does
+  * debian/control: Suggests libpam-cracklib
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 17 Jan 2008 08:59:36 -0500
+
+auth-client-config (0.4-0ubuntu1) gutsy; urgency=low
+
+  * new upstream release 
+  * move sed to Build-Depends-Indep
+  * backported fix for building as root user from 0.4.1
+
+ -- James D Strandboge <jamie@anemonecomputing.com>  Mon, 13 Aug 2007 15:33:01 -0400
+
+auth-client-config (0.3-0ubuntu1) gutsy; urgency=low
+
+  * new upstream release 
+  * debian/rules: use run_tests.sh
+  * debian/control: adjust XS-Python-Version to be >= 2.3
+  * debian/control: Build-Depends on sed
+
+ -- James D Strandboge <jamie@anemonecomputing.com>  Sun,  5 Aug 2007 21:37:31 -0400
+
+auth-client-config (0.2-0ubuntu1) gutsy; urgency=low
+
+  * initial release
+
+ -- Jamie Strandboge <jamie@strandboge.com>  Wed,  1 Aug 2007 04:31:43 -0400

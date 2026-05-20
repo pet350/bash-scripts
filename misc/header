@@ -1,0 +1,21 @@
+#!/bin/bash
+# Shell Script By: Peter Talbott
+
+# Source function library.
+if [ -f /lib/lsb/init-functions ]; then
+  . /lib/lsb/init-functions
+else
+  echo -e "Error! /lib/lsb/init-functions Not found!"
+  exit 1
+fi
+
+if [ -f /usr/local/scripts/include/*.sh ]; then
+  for INCLUDE_FILE in $(ls -1 /usr/local/scripts/include/*.sh); do
+    . $INCLUDE_FILE
+  done
+else
+  echo -e "Error! /usr/local/scripts/include/*.sh Not Found!"
+  exit 1
+fi
+
+

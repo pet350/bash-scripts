@@ -1,0 +1,10 @@
+#! /bin/sh
+# Simple Script to run Kings Quest III VGA
+
+
+cd "/opt/usr/wine64/Program Files (x86)/IA/King's Quest III"
+wine KQ3.exe
+cd /
+
+
+

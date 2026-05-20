@@ -1,0 +1,22 @@
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+This program updates nsswitch.conf and pam configuration files to aid in
+authentication configuration.
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -a, --all-types       apply all types for specified profile
+  -d, --database-only   update only if current entries are in database
+  -f FILE, --file=FILE  update FILE instead of default
+  -l, --list-profiles   list available profiles
+  -L, --list-types      list available types
+  -n, --dry-run         don't modify anything, just show the changes
+  -p PROFILE, --profile=PROFILE
+                        set profile to PROFILE
+  -r, --reset           reset to previous non-auth-client-config values
+  -s, --check-system    determine if system files are set to PROFILE
+  -S, --show-system     show current system settings as a profile
+  -t TYPE, --type=TYPE  modify files for TYPE

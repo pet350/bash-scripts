@@ -1,0 +1,11 @@
+Available profiles are:
+  cracklib
+  kerberos
+  kerberos2
+  ldap
+Available types are:
+  nss
+  pam-account
+  pam-auth
+  pam-password
+  pam-session

@@ -1,0 +1,19 @@
+#! /bin/sh
+## Script to find $1 files and removed them
+## Version 0.2
+
+FILE="find.info"
+find . -name  $1 >$FILE
+
+# read $FILE using the file descriptors
+exec 3<&0
+exec 0<$FILE
+while read line
+do
+	# use $line variable to process line
+	rm -v "$line"
+done
+exec 0<&3
+
+rm -v $FILE
+

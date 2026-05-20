@@ -1,0 +1,194 @@
+TESTING INDIVIDUAL
+# /etc/nsswitch.conf
+#
+# Example configuration of GNU Name Service Switch functionality.
+# If you have the `glibc-doc' and `info' packages installed, try:
+# `info libc "Name Service Switch"' for information about this file.
+
+# pre_auth-client-config # passwd:         compat 
+passwd: files db
+# pre_auth-client-config # group:          compat		
+group: files db
+# pre_auth-client-config # shadow:         compat
+shadow: files
+
+hosts:          files dns mdns
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+# pre_auth-client-config # netgroup:       nis
+netgroup: nis
+#
+# /etc/pam.d/common-account - authorization settings common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of the authorization modules that define
+# the central access policy for use on the system.  The default is to
+# only deny service to users whose accounts are expired in /etc/shadow.
+#
+# pre_auth-client-config # account	required	pam_unix.so 
+account sufficient      pam_krb5.so debug
+account sufficient      pam_unix.so debug
+account required        pam_permit.so
+#
+# /etc/pam.d/common-auth - authentication settings common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of the authentication modules that define
+# the central authentication scheme for use on the system
+# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the
+# traditional Unix authentication mechanisms.
+#
+# pre_auth-client-config # auth	required	pam_unix.so nullok_secure	
+auth    [success=done default=ignore]   pam_unix.so nullok_secure debug
+auth    [authinfo_unavail=ignore success=1 default=2] pam_krb5.so use_first_pass debug
+auth    [default=done]  pam_ccreds.so action=validate use_first_pass
+auth    [default=done]  pam_ccreds.so action=store
+auth    [default=bad]   pam_ccreds.so action=update
+#
+# /etc/pam.d/common-password - password-related modules common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of modules that define  the services to be
+#used to change user passwords.  The default is pam_unix
+
+# The "nullok" option allows users to change an empty password, else
+# empty passwords are treated as locked accounts.
+#
+# (Add `md5' after the module name to enable MD5 passwords)
+#
+# The "obscure" option replaces the old `OBSCURE_CHECKS_ENAB' option in
+# login.defs. Also the "min" and "max" options enforce the length of the
+# new password.
+
+# pre_auth-client-config # password   required   pam_unix.so nullok obscure min=4 max=8 md5  
+
+# Alternate strength checking for password. Note that this
+# requires the libpam-cracklib package to be installed.
+# You will need to comment out the password line above and
+# uncomment the next two in order to use this.
+# (Replaces the `OBSCURE_CHECKS_ENAB', `CRACKLIB_DICTPATH')
+#
+# password required	  pam_cracklib.so retry=3 minlen=6 difok=3
+# password required	  pam_unix.so use_authtok nullok md5
+
+password sufficient     pam_unix.so nullok obscure min=4 max=8 md5 debug
+password sufficient     pam_krb5.so debug try_first_pass
+password required       pam_deny.so
+#
+# /etc/pam.d/common-session - session-related modules common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of modules that define tasks to be performed
+# at the start and end of sessions of *any* kind (both interactive and
+# non-interactive).  The default is pam_unix.
+#
+# pre_auth-client-config # session	required	pam_unix.so	
+# pre_auth-client-config # session	optional	pam_foreground.so 
+
+
+session required        pam_mkhomedir.so umask=0022 skel=/etc/skel
+session optional        pam_foreground.so
+session optional        pam_krb5.so debug
+session required        pam_unix.so debug
+TESTING ALL
+# /etc/nsswitch.conf
+#
+# Example configuration of GNU Name Service Switch functionality.
+# If you have the `glibc-doc' and `info' packages installed, try:
+# `info libc "Name Service Switch"' for information about this file.
+
+# pre_auth-client-config # passwd:         compat 
+passwd: files db
+# pre_auth-client-config # group:          compat		
+group: files db
+# pre_auth-client-config # shadow:         compat
+shadow: files
+
+hosts:          files dns mdns
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+# pre_auth-client-config # netgroup:       nis
+netgroup: nis
+#
+# /etc/pam.d/common-account - authorization settings common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of the authorization modules that define
+# the central access policy for use on the system.  The default is to
+# only deny service to users whose accounts are expired in /etc/shadow.
+#
+# pre_auth-client-config # account	required	pam_unix.so 
+account sufficient      pam_krb5.so debug
+account sufficient      pam_unix.so debug
+account required        pam_permit.so
+#
+# /etc/pam.d/common-auth - authentication settings common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of the authentication modules that define
+# the central authentication scheme for use on the system
+# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the
+# traditional Unix authentication mechanisms.
+#
+# pre_auth-client-config # auth	required	pam_unix.so nullok_secure	
+auth    [success=done default=ignore]   pam_unix.so nullok_secure debug
+auth    [authinfo_unavail=ignore success=1 default=2] pam_krb5.so use_first_pass debug
+auth    [default=done]  pam_ccreds.so action=validate use_first_pass
+auth    [default=done]  pam_ccreds.so action=store
+auth    [default=bad]   pam_ccreds.so action=update
+#
+# /etc/pam.d/common-password - password-related modules common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of modules that define  the services to be
+#used to change user passwords.  The default is pam_unix
+
+# The "nullok" option allows users to change an empty password, else
+# empty passwords are treated as locked accounts.
+#
+# (Add `md5' after the module name to enable MD5 passwords)
+#
+# The "obscure" option replaces the old `OBSCURE_CHECKS_ENAB' option in
+# login.defs. Also the "min" and "max" options enforce the length of the
+# new password.
+
+# pre_auth-client-config # password   required   pam_unix.so nullok obscure min=4 max=8 md5  
+
+# Alternate strength checking for password. Note that this
+# requires the libpam-cracklib package to be installed.
+# You will need to comment out the password line above and
+# uncomment the next two in order to use this.
+# (Replaces the `OBSCURE_CHECKS_ENAB', `CRACKLIB_DICTPATH')
+#
+# password required	  pam_cracklib.so retry=3 minlen=6 difok=3
+# password required	  pam_unix.so use_authtok nullok md5
+
+password sufficient     pam_unix.so nullok obscure min=4 max=8 md5 debug
+password sufficient     pam_krb5.so debug try_first_pass
+password required       pam_deny.so
+#
+# /etc/pam.d/common-session - session-related modules common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of modules that define tasks to be performed
+# at the start and end of sessions of *any* kind (both interactive and
+# non-interactive).  The default is pam_unix.
+#
+# pre_auth-client-config # session	required	pam_unix.so	
+# pre_auth-client-config # session	optional	pam_foreground.so 
+
+
+session required        pam_mkhomedir.so umask=0022 skel=/etc/skel
+session optional        pam_foreground.so
+session optional        pam_krb5.so debug
+session required        pam_unix.so debug

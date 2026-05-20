@@ -1,0 +1,24 @@
+## LDAP Configuration
+## By: Peter Talbott
+
+base		dc=gigaware,dc=lan
+uri		ldaps://ldap.gigaware.lan ldaps://xen.gigaware.lan
+port		636
+
+ldap_version	3
+rootbinddn	cn=admin,dc=gigaware,dc=lan
+scope		sub
+
+# Connection Limitation Settings
+sizelimit	100000
+timelimit	15
+idle_timelimit	300
+deref		never
+
+# Encryption SSL/TLS Settings
+ssl		on
+tls_reqcert	never
+tls_checkpeer	no
+tls_cacertdir	/etc/ldap/sasl2/
+tls_cacert	/etc/ldap/sasl2/ldap_server.crt
+

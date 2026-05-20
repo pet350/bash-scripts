@@ -1,0 +1,70 @@
+AUTHOR: Jamie Strandboge (jdstrand) <jamie@ubuntu.com>
+
+REQUIREMENTS
+------------
+python >= 2.3
+'sed' that supports '-i' (for installation)
+'cp' that supports '-L' (for installation)
+
+Installation
+------------
+./install.py --prefix=PREFIX --config-prefix=CONFIGDIR
+
+Eg:
+./install.py --prefix=/usr --config-prefix=/etc
+
+To verify everything is working right:
+./runtests.sh (should not have any errors)
+
+Usage
+-----
+See:
+$ man auth-client-config
+$ auth-client-config -h
+
+Also see:
+https://wiki.ubuntu.com/LDAPAuthentication
+https://launchpad.net/auth-client-config
+
+
+Usage in Packaging Scripts
+--------------------------
+There are a few options that will aid in scripting:
+
+auth-client-config -p profile_name -a -s
+  exit status '0' if current system configuration matches 'profile_name',
+  otherwise exit status '1'
+
+auth-client-config -p profile_name -a -d
+  update system configuration with 'profile_name' only if the current system
+  configuration exists in the profiles database
+
+auth-client-config -p profile_name -a -r
+  if a previous state exists, reset it to previous state if the current
+  system configuration matches 'profile_name'
+
+
+A policy will need to be developed for distributions using auth-client-config
+so that it will not overwrite user changes or overwrite the current
+auth-client-config configuration on upgrades.
+
+
+Testing
+-------
+You can test auth-client-config as non-root by doing:
+$ mkdir -p /tmp/acc/usr /tmp/acc/etc/pam.d
+$ cp /etc/nsswitch.conf /tmp/acc/etc
+$ cp /etc/pam.d/common-* /tmp/acc/etc/pam.d
+$ ./install.py --prefix=/tmp/acc/usr --config-prefix=/tmp/acc/etc
+
+Now do:
+$ /tmp/acc/usr/sbin/auth-client-config --help
+
+
+TODO
+----
+Move some configuration from auth-client-config into
+/etc/auth-client-config/acc.conf
+
+Basic syntax checks
+

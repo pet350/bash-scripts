@@ -1,0 +1,22 @@
+#! /bin/bash
+
+declare -ag src-file=('file:///usr/local/bin/AssassinsCreed1' 'file:///usr/local/bin/HitmanBloodMoney' 'file:///usr/local/bin/HitmanContracts'
+file:///usr/local/bin/HitmanSilentAssassin
+file:///usr/local/bin/kq2vga
+file:///usr/local/bin/kq3vga
+file:///usr/local/bin/LegoStarWars
+file:///usr/local/bin/lotrbfme
+file:///usr/local/bin/Oblivion
+file:///usr/local/bin/swbf2
+file:///usr/local/bin/swkotor
+file:///usr/local/bin/swkotor2
+file:///usr/local/bin/swkotor2-kse
+file:///usr/local/bin/swkotor-kse
+file:///usr/local/bin/swtfu
+file:///usr/local/bin/Transformers
+file:///usr/local/bin/TwoWorlds2
+file:///usr/local/bin/winsol
+file:///usr/local/bin/Witcher
+file:///usr/local/bin/Witcher2
+file:///usr/local/bin/Witcher2userContent
+

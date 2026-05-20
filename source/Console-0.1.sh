@@ -1,0 +1,26 @@
+#!/bin/bash
+# Version 0.1
+# Peter Talbott
+
+case ${TERM,,} in
+  dumb)
+     # If running in a 'dumb' terminal, do nothing
+     ;;
+  *)
+     if [ ${#TRUE}              -eq 0 ]; then export TRUE=1;                            fi
+     if [ ${#FALSE}             -eq 0 ]; then export FALSE=0;                           fi
+     if [ ${#BOL_VERBOSE}	-eq 0 ]; then export BOL_VERBOSE=$FALSE;                fi
+     if [ ${#DEV_TTY}		-eq 0 ]; then export DEV_TTY="/dev/tty";                fi
+     OLD=$(stty -g)
+     stty raw -echo min 0 time 5
+     printf '\0337\033[r\033[999;999H\033[6n\0338' > $DEV_TTY
+     IFS='[;R' read -r _ ROWS COLS _ < $DEV_TTY
+     stty "$OLD"
+     stty cols "$COLS" rows "$ROWS"
+     if [ $BOL_VERBOSE -eq $TRUE ]; then echo -e "Columns X Rows: $COLS X $ROWS";	fi
+     for DATA in OLD ROWS COLS DEV_TTY; do
+       unset $DATA
+     done
+     ;;
+esac
+

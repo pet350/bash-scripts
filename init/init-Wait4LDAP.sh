@@ -1,0 +1,1 @@
+./init-Wait4LDAP-0.1.sh

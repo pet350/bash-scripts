@@ -1,0 +1,8 @@
+#! /bin/sh
+
+sleep 30
+## Modified Code
+x11vnc -rfbauth ~/.vnc/passwd -bg -rfbport 5901 -gui tray=minimal,iconfont=14x17 -forever -noxdamage -shared &
+
+## Origonal Code
+#x11vnc -rfbauth ~/.vnc/passwd -bg -accept "popup" -gone "popup" -rfbport 5900 -gui tray=minimal,iconfont=14x17 -forever -noxdamage -shared &

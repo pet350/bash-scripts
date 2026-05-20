@@ -1,0 +1,33 @@
+#! /bin/sh
+# Simple Script to Show Movie Counts
+
+printf "Total Movie Counts\n"
+printf "Action Adventure:\t"
+ls -1 /opt/video/movies/Action | wc -l
+
+printf "Children:\t\t"
+ls -1 /opt/video/movies/Children | wc -l
+
+printf "Comedy:\t\t\t"
+ls -1 /opt/video/movies/Comedy | wc -l
+
+printf "Drama:\t\t\t"
+ls -1 /opt/video/movies/Drama | wc -l
+
+printf "Horror:\t\t\t"
+ls -1 /opt/video/movies/Horror | wc -l
+
+printf "Music:\t\t\t"
+ls -1 /opt/video/movies/Music | wc -l
+
+printf "SciFi:\t\t\t"
+ls -1 /opt/video/movies/SciFi | wc -l
+
+printf "TiVo:\t\t\t"
+ls -1 /opt/video/movies/TiVo | wc -l
+
+printf "Unsorted:\t\t"
+ls -1 /opt/video/movies/Unsorted | wc -l
+
+printf "\nFull Movie List:\t"
+ls -1 /opt/video/movies/Full.List | wc -l

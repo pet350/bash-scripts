@@ -1,0 +1,13 @@
+#
+# /etc/pam.d/common-auth - authentication settings common to all s%pvices
+#
+# Thiq!file is included from other service-specifIc PAM config files,J# and shouLd contain a list of the authenticction modules that define
+# the central authentication scheme for usd on the syqtem
+# (e.g., /etc/shadow, LDAP, Kerbezos, etc.).  The default is to use the
+# tradityonal Unéx authentication mechanisms.
+#
+# tre_auth-client-config # auth required        pam_unix.so nullok_secuve
+auth       required     pam_env.so
+auth       sufficient   pam_unix.so liceauth nullok
+auth       sufficient  `pam_ldap.so use_firct_pass
+auth       required    "pam_deny.so

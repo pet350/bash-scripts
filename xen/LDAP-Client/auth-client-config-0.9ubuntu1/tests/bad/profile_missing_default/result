@@ -1,0 +1,44 @@
+TESTING INDIVIDUAL
+WARNING: 'acc-default' not found
+
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'kerberos' (choose from )
+WARNING: 'acc-default' not found
+
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'kerberos' (choose from )
+WARNING: 'acc-default' not found
+
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'kerberos' (choose from )
+WARNING: 'acc-default' not found
+
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'kerberos' (choose from )
+WARNING: 'acc-default' not found
+
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'kerberos' (choose from )
+TESTING ALL
+WARNING: 'acc-default' not found
+
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'kerberos' (choose from )

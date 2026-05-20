@@ -1,0 +1,1 @@
+./start-gnome-keyring-0.1.sh

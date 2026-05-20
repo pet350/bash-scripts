@@ -1,0 +1,12 @@
+#! /bin/sh
+# Simple script to launch under wine "The Witcher Enhanced Edition"
+
+sleep 2
+export WINEDEBUG=-all
+
+cd "/opt/usr/wine32/GOG Games/The Witcher Enhanced Edition Director's Cut/System"
+WINEARCH=win32 WINEPREFIX=~/.wine32 wine witcher.exe -dontForceMinReqs
+cd /
+
+xrandr -s 1366x768
+return 0

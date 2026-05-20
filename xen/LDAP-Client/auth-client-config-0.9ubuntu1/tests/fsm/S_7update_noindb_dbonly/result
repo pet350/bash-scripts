@@ -1,0 +1,20 @@
+TESTING INDIVIDUAL (dbonly)
+Error in updating the file: Current settings not in database, but database-only specified.  Skipping 'nss'
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: Current settings not in database, but database-only specified.  Skipping 'pam-account'
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: Current settings not in database, but database-only specified.  Skipping 'pam-auth'
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: Current settings not in database, but database-only specified.  Skipping 'pam-password'
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: Current settings not in database, but database-only specified.  Skipping 'pam-session'
+--
+Errors found.  Aborting (no changes made)
+TESTING ALL (dbonly)
+Error in updating the file: Current settings not in database, but database-only specified.  Skipping 'nss'
+--
+Errors found.  Aborting (no changes made)

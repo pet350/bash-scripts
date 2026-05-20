@@ -1,0 +1,40 @@
+TESTING INDIVIDUAL
+Error in resetting 'nss': 'kerberos' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-account': 'kerberos' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-auth': 'kerberos' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-password': 'kerberos' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-session': 'kerberos' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+TESTING ALL
+Error in resetting 'nss': 'kerberos' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+TESTING INDIVIDUAL (dbonly)
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+TESTING ALL (dbonly)
+
+Cannot specify 'database-only' when using 'reset'
+

@@ -1,0 +1,7 @@
+TESTING ALL
+WARNING: invalid value for 'local_example:pam_session' (too long).  Skipping
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: 'local_example' (choose from 'kerberos')

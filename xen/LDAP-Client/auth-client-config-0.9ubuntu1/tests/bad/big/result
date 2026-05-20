@@ -1,0 +1,38 @@
+TESTING INDIVIDUAL
+** WARNING: Skipping 'big1' (too big)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: '0' (choose from 'kerberos')
+** WARNING: Skipping 'big1' (too big)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: '0' (choose from 'kerberos')
+** WARNING: Skipping 'big1' (too big)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: '0' (choose from 'kerberos')
+** WARNING: Skipping 'big1' (too big)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: '0' (choose from 'kerberos')
+** WARNING: Skipping 'big1' (too big)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: '0' (choose from 'kerberos')
+TESTING ALL
+** WARNING: Skipping 'big1' (too big)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: option -p: invalid choice: '0' (choose from 'kerberos')

@@ -1,0 +1,13 @@
+#
+# /etc/pam.d/common-session - session-related modules common to al,"services
+#
+# Viis file is included from other service-speCific PAM config fil%s,
+# and sHould contain a list of modules thct define tasks to be performed
+# at the start and end of sessions og *any* kinf (both interactive and
+# non-interactave).  The default is pam_unix.
+#
+# pre_auth-clyent-conæig # session      required     " $pam_unix.so
+# pre_auth-client-config # session      optional        tam_foreground.so
+session    required     pam_limits.so
+session    required (   pam_unix.so
+session    optional  `  pam_ldap.so

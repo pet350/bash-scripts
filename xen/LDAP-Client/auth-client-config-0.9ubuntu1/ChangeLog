@@ -1,0 +1,122 @@
+auth-client-config (0.7)
+  * update cracklib profile to use pam_smbpass.so (LP: #208419)
+  * remove debconf dependency and usage (will add it back when needed)
+  * added NSS netgroup support (LP: #179919)
+
+auth-client-config (0.6)
+  * fix for '%' in config file LP: #191610
+  * update kerberos_example to not talk about ldap LP: #191990
+  * fix whitespace and comments PEP-8 compliance issues
+
+auth-client-config (0.5)
+  * update copyright informaion (email address)
+  * auth-client-config
+    - version bump
+    - removed comments
+  * added cracklib profile and tests
+  * run_tests.sh:
+    - clean out etc/* after install.py since we provide those files in tests
+    - supports running individual test classes
+  * install.py: fix typos
+  * removed files:
+    - LICENSE (still have COPYING)
+    - files in sbin/ and share/ (created on install)
+
+auth-client-config (0.4.2)
+  * revision: bzr2
+  * auth-client-config
+    - version bump
+    - don't fail if other PAM entries don't exist if the one we specified with
+      '-t' does
+  * bad/profile_missing_entries/result: updated for auth-client-config changes
+  * README: added todo entry to check syntax
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Wed,  5 Dec 2007 15:18:45 -0500
+
+auth-client-config (0.4.1)
+
+  * added an 'insecure' variable so that doChecks() can be skipped
+
+ -- James D Strandboge <jamie@anemonecomputing.com>  Wed, 13 Aug 2007 07:31:45 -0400
+
+auth-client-config (0.4) unstable; urgency=low
+
+  * bumped version
+  * auth-client-config:
+    - added doChecks() for various security checks 
+    - updated getProfiles() to check that we don't read in more the MaxFileSize
+      bytes total
+    - honor '-p' in reset
+    - added '-s' option to check if profile (specified with -p) is current
+    - added '-S' option to display the current system configuration as a profile
+    - skip hidden files in profilesDir
+    - use verifyConfig in setConfig to be sure that we have a valid configuration
+      file (really, it only checks if there are entries in the config file that
+      are meaningful to auth-client-config)
+    - use verifyConfig() in main on tmpfiles before actually updating system
+      configuration
+    - properly honor '-f' option
+    - check that files in profilesDir have proper perms and not symlinks
+  * state diagram:
+    - include error conditions of profile specified with '-p' not in current 
+      system configuration when resetting
+    - clarification for S_8
+  * manpage:
+    - added -s and -S
+    - fixed typos
+    - clarified '-r' usage
+  * tests:
+    - added fsm/S_7reset_indb_noincur
+    - updated S_3reset_noindb, S_7reset_indb_n_gt_1, S_7reset_noindb for new
+      error messages
+    - updated S_8 with correct prfile (now that we enforce '-p')
+    - updated installation/check_help
+    - added bad/*
+    - run_tests.sh: use sed to fix up python discrepencies
+    - installation/check_help: remove sed (do it in run_test.sh)
+
+ -- James D Strandboge <jamie@anemonecomputing.com>  Wed,  8 Aug 2007 07:31:45 -0400
+
+auth-client-config (0.3) unstable; urgency=low
+
+  * bumped version
+  * added implementation/* files (ie state diagram)
+  * updated man page
+  * install.py
+    - adjust auth-client-config and manpage to use config-prefix
+    - added --destdir option
+  * commented out 'local' profile in acc-default
+  * added run_tests.sh and tests/*.  Currently only checks finite state machine
+    correctness, and checks that help and profiles didn't change
+  * auth-client-config
+    - read in default_profile before all others
+    - warn if duplicate duplicate profiles are found
+    - added '-d' option to preserve user settings on system upgrades
+    - added '-a' option to apply entire profile in one go
+    - require '-p' (even with '-r')
+    - fixed lame sys.exit typos
+    - modifed reset to comply with state diagram
+    - modifed update to comply with state diagram
+    - added some comments for algorithms
+    - updated help
+
+ -- James D Strandboge <jamie@anemonecomputing.com>  Thu,  6 Aug 2007 09:05:47 -0400
+
+auth-client-config (0.2) unstable; urgency=low
+
+  * added (rudimentary) installation routine (install.py)
+  * moved files around to simplify install.py
+  * auth-client-config
+    - process /etc/auth-config/profile.d/* for files
+    - fixed some exception typos
+    - finish changing 'Mechanism' to 'Profile' throughout
+    - clean up setProfile
+    - simplify error messages in *::updateConfig()
+
+ -- James D Strandboge <jamie@anemonecomputing.com>  Fri, 27 Jul 2007 15:28:33 -0400
+
+auth-client-config (0.1) unstable; urgency=low
+
+  * initial release
+
+ -- Jamie Strandboge <jamie@strandboge.com>  Mon, 17 Jul 2007 10:57:58 -0400

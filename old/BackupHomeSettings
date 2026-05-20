@@ -1,0 +1,56 @@
+#! /bin/sh
+
+############################################################
+# Script to backup UbuntuServer Settings, Packages and LDAP
+# Must be run ar ROOT user!
+# ---------------------------------------------------------
+# Modified script for UbuntuLaptop
+############################################################
+
+# 1. What to backup
+#backup_files="/home /etc /root /boot /usr/local"
+backup_files="/home"
+
+# 2. Where to backup to.
+dest="/opt/usr/bak/home"
+
+# 3. Set where slapcat resides
+# -- Do not backup any LDAP on Laptop
+#SLAPCAT=/usr/sbin/slapcat
+
+# 4. Create a list of packages installed on system
+dpkg --get-selections > /etc/apt/packages/Package.list
+cp -R /etc/apt/sources.list* /etc/apt/packages
+apt-key exportall > /etc/apt/packages/Repo.keys
+
+# 5. Create archive filename.
+day=$(date +%A)
+hostname=$(hostname -s)
+archive_file="$hostname-$day.tar.gz"
+
+# 6. Print start status message.
+echo "Backing up $backup_files to $dest/$archive_file"
+date
+echo
+
+# 7. Backup the files using tar.
+tar czvf $dest/$archive_file $backup_files
+
+# 8. Copy package list and /usr/local/bin to destination
+#cp -vR /etc/apt/packages $dest
+#cp -vR /usr/local/bin $dest
+
+# 9. Backup LDAP
+# -- Do not backup any LDAP on Laptop
+#nice ${SLAPCAT} -n 0 > ${dest}/config.ldif
+#nice ${SLAPCAT} -n 1 > ${dest}/gigaware.local.ldif
+#nice ${SLAPCAT} -n 2 > ${dest}/access.ldif
+#chmod 600 ${dest}/*.ldif
+
+# 10. Print end status message.
+echo
+echo "Backup finished"
+date
+
+# Long listing of files in $dest to check file sizes.
+ls -lh $dest

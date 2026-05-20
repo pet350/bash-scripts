@@ -1,0 +1,4 @@
+#! /bin/bash
+
+# Simple script to check RAID device /dev/md0
+echo check > /sys/block/md0/md/sync_action

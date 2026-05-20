@@ -1,0 +1,10 @@
+#! /bin/sh
+# Simple Script to run Kings Quest II VGA
+
+
+cd "/opt/usr/wine64/Program Files (x86)/Tierra/KQ2VGA"
+wine KQ2VGA.exe
+cd /
+
+
+

@@ -1,0 +1,20 @@
+TESTING INDIVIDUAL
+Error in updating the file: 'nss_group' not found
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: 'pam_account' not found
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: 'pam_auth' not found
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: 'pam_password' not found
+--
+Errors found.  Aborting (no changes made)
+Error in updating the file: 'pam_session' not found
+--
+Errors found.  Aborting (no changes made)
+TESTING ALL
+Error in updating the file: 'nss_group' not found
+--
+Errors found.  Aborting (no changes made)

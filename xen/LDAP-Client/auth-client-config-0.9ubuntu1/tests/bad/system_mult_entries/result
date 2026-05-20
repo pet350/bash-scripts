@@ -1,0 +1,16 @@
+TESTING INDIVIDUAL (update)
+Error in setting the file: 'nsswitch.conf' has multiple entries for 'passwd'
+--
+Errors found.  Aborting (no changes made)
+TESTING ALL (update)
+Error in setting the file: 'nsswitch.conf' has multiple entries for 'passwd'
+--
+Errors found.  Aborting (no changes made)
+TESTING INDIVIDUAL (reset)
+Error in setting the file: 'nsswitch.conf' has multiple entries for 'passwd'
+--
+Errors found.  Aborting (no changes made)
+TESTING ALL (reset)
+Error in setting the file: 'nsswitch.conf' has multiple entries for 'passwd'
+--
+Errors found.  Aborting (no changes made)

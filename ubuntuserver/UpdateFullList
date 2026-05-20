@@ -1,0 +1,19 @@
+#! /bin/sh
+
+# Simple Script to Update Full Movie List
+
+cd /opt/video/movies/Full.List
+rm /opt/video/movies/Full.List/*
+
+ln -sfv ../Action/* /opt/video/movies/Full.List
+ln -sfv ../Children/* /opt/video/movies/Full.List
+ln -sfv ../Comedy/* /opt/video/movies/Full.List
+ln -sfv ../Drama/* /opt/video/movies/Full.List
+ln -sfv ../Horror/* /opt/video/movies/Full.List
+ln -sfv ../Music/* /opt/video/movies/Full.List
+ln -sfv ../SciFi/* /opt/video/movies/Full.List
+ln -sfv ../TiVo/* /opt/video/movies/Full.List
+ln -sfv ../Unsorted/* /opt/video/movies/Full.List
+
+printf "\n"
+/usr/local/bin/MovieCount

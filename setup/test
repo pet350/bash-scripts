@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Source function library.
+LSB_FUNCTIONS="/lib/lsb/init-functions"
+ls /usr/local/scripts/include/*.sh >/dev/null 2>/dev/null 3>/dev/null
+if [ $? -eq 0 ] && [ -f $LSB_FUNCTIONS ]; then
+  for INCLUDE_FILE in $LSB_FUNCTIONS $(ls -1 /usr/local/scripts/include/*.sh); do
+    . $INCLUDE_FILE
+  done
+else
+  echo -e "Error! Missing source files!"
+  exit 1
+fi
+
+# Define RUN_CMD and VERSION
+export RUN_CMD="$(basename $0)"
+export VERSION="0.1"
+export AUTHOR="Peter Talbott"
+export MODIFIED="2021-20-12"
+
+# Self explanitory function
+function SHOW_HEADER()
+{
+  printf "%s: " "$(SHOW_DATE_TIME)";    CLB_TEXT; printf "%s:\t" "$RUN_CMD";    CLG_TEXT; printf "Version: ";  CY_TEXT;  printf "%s\t" "$VERSION";      CLG_TEXT; printf "By: "; CLR_TEXT
+  printf "%s " "$AUTHOR";               CLG_TEXT; printf "Dated: ";             CLR_TEXT; printf "%s\n" "$MODIFIED"
+  printf "%s: " "$(SHOW_DATE_TIME)";    CLB_TEXT; printf "%s:\t" "$BASH_BIN";   CLG_TEXT; printf "Version: ";  CY_TEXT;  printf "%s\n" "${BASH_VERSINFO[5]^^}"; CN_TEXT
+  return $SUCCESS
+};
+
+case "${BASH_VERSINFO[5],,}" in
+  'x86_64-suse-linux')		declare -i BOL_OPENSUSE=$TRUE;		export SETUP_BIN="$ZYPPER_BIN";;
+  *)	SHOW_HEADER; echo "Unsupported O/S"; exit $SUCCESS;;
+esac
+
+for OPTION in $@; do
+  case ${OPTION,,} in
+    --verbose | -v)		declare -i BOL_VERBOSE=$TRUE;;
+    --test | -t)		declare -i BOL_TEST=$TRUE;		export SETUP_BIN="$TRUE_BIN";;
+    --patterns)			declare -i BOL_PATTERN_ARRAY=$TRUE;;
+    --no-patterns)		declare -i BOL_PATTERN_ARRAY=$FALSE;;
+  esac
+done
+

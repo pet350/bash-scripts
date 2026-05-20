@@ -1,0 +1,12 @@
+#! /bin/sh
+# Simple script to launch under wine "Star Wars Battlefront 2"
+
+sleep 2
+export WINEDEBUG=-all
+
+cd "/opt/usr/wine32/GOG Games/Star Wars - Battlefront 2/GameData"
+WINEARCH=win32 WINEPREFIX=~/.wine32 wine BattlefrontII.exe
+cd /
+
+xrandr -s 1366x768
+return 0

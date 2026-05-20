@@ -1,0 +1,3 @@
+
+
+for VMLINUZ in $(ls /boot/vmlinuz-*); do KVERSION=${VMLINUZ#*-}; INITRD="/boot/initrd-$KVERSION"; echo -e "Version $KVERSION"; echo -e "Initrd: $INITRD"; dracut $INITRD $KVERSION  --early-microcode --strip --lvmconf --mdadmconf --fstab --zstd  --printsize --force; done

@@ -1,0 +1,100 @@
+#!/bin/bash
+# CheckServices V0.1
+# By: Peter Talbott	2017-06-23
+# Simple bash Script to check if needed services are running
+
+echo CheckServices Version 0.1
+#-----------------------------------------------------------------------
+printf "\nChecking Name Resolution Network Services\n"
+
+printf "AVAHI\tmDNS Stack Daemon\t\t\t\t\t\t"
+if pgrep -x "avahi-daemon" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+printf "NMBD\tNetBIOS name server Daemon\t\t\t\t\t"
+if pgrep -x "nmbd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+#-----------------------------------------------------------------------
+printf "\nChecking Directory and Authentication Services\n"
+
+printf "SLAPD\tLDAP (Lightweight Directory Access Protocol) Daemon\t\t"
+if pgrep -x "slapd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+printf "NSCD\tName Service Cache Daemon\t\t\t\t\t"
+if pgrep -x "nscd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+printf "WINBIND\tWindows Name Service Switch Daemon\t\t\t\t"
+if pgrep -x "winbindd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+#-----------------------------------------------------------------------
+printf "\nChecking Network File Sharing Services\n"
+
+printf "NFSD\tUnix Network File Sharing Daemon\t\t\t\t"
+if pgrep -x "nfsd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+printf "SMBD\tWindows File Sharing Daemon\t\t\t\t\t"
+if pgrep -x "smbd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+printf "\nChecking Simple Network Services\n"
+
+printf "SNMPD\tSimple Network Management Protocol Daemon\t\t\t"
+if pgrep -x "snmpd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+printf "NTPD\tNetwork Time Protocol Daemon\t\t\t\t\t"
+if pgrep -x "ntpd" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+printf "ZEBRA\tZebra Routing Daemon (Cisco IOS)\t\t\t\t"
+if pgrep -x "zebra" > /dev/null
+then
+   printf "[ OK ]\n"
+else
+   printf "[FAIL]\n"
+fi
+
+

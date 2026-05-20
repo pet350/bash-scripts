@@ -1,0 +1,60 @@
+#!/bin/bash
+## VERY Simple Script to create a encode list
+
+# Source function library.
+LSB_FUNCTIONS="/lib/lsb/init-functions"
+ls /usr/local/scripts/include/*.sh >/dev/null 2>/dev/null 3>/dev/null
+if [ $? -eq 0 ] && [ -f $LSB_FUNCTIONS ]; then
+  for INCLUDE_FILE in $LSB_FUNCTIONS $(ls -1 /usr/local/scripts/include/*.sh); do
+    . $INCLUDE_FILE
+  done
+else
+  echo -e "Error! Missing source files!"
+  exit 1
+fi
+
+# Define RUN_CMD and VERSION
+export RUN_CMD="$(basename $0)"
+export VERSION="0.1"
+export AUTHOR="Peter Talbott"
+export MODIFIED="2021-10-04"
+
+if [ ${#OUT_EXT}	-eq 0 ]; then export OUT_EXT="mp3";						fi
+if [ ${#FFMPEG_OPTS[@]}	-eq 0 ]; then declare -a FFMPEG_OPTS=("-vn" "-c:a" "libmp3lame" "-q:a" "1");	fi
+if [ ${#TIMER}		-eq 0 ]; then declare -i TIMER=2;						fi
+
+function PRINT_TEMP()
+{
+  declare -i CHAR_TOTAL=$(echo $TEMP | wc -m)
+  declare -i CHAR_COUNT=0
+  declare -i TEMP_COUNT=0
+
+  for TEMP_DATA in $TEMP; do
+    printf "%s" $TEMP_DATA
+    TEMP_COUNT=$(echo $TEMP_DATA | wc -m)
+    CHAR_COUNT=$((CHAR_COUNT+TEMP_COUNT))
+    if [ $CHAR_COUNT -lt $CHAR_TOTAL ]; then printf " "; fi
+  done
+  printf "\n"
+  return $?
+};
+
+function SHOW_DETAILS()
+{
+  printf "Input File:  %-50s\n" "$(TEMP=$INPUT_FILE; PRINT_TEMP)"
+  printf "Output File: %-50s\n" "$(TEMP=$OUTPUT_FILE; PRINT_TEMP)"
+  return $?
+};
+
+while IFS= read INPUT_FILE; do
+  export OUTPUT_FILE="${INPUT_FILE%.*}.$OUT_EXT"
+  if [ $BOL_VERBOSE -eq $TRUE ]; then SHOW_DETAILS; fi
+  if [ $BOL_VERBOSE -eq $TRUE ]; then printf "Executing: "; fi
+  printf "%s -i " $FFMPEG_BIN; printf "'"
+  printf "%s" "$(TEMP=$INPUT_FILE; PRINT_TEMP)"; printf "'"
+  printf " %s " ${FFMPEG_OPTS[@]}; printf "'"
+  printf "%s" "$(TEMP=$OUTPUT_FILE; PRINT_TEMP)"; printf "'"
+  #$FFMPEG_BIN -i "$(TEMP=$INPUT_FILE; PRINT_TEMP)" ${FFMPEG_OPTS[@]} "$(TEMP=$OUTPUT_FILE; PRINT_TEMP)"
+  if [ $BOL_VERBOSE -eq $TRUE ]; then printf "\n\n"; else printf "\n"; fi
+  if [ $BOL_WAIT    -eq $TRUE ]; then sleep $TIMER; fi
+done < <(ls -1 *.mp4)

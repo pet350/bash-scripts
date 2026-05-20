@@ -1,0 +1,228 @@
+#!/bin/bash
+# Shell Script By: Peter Talbott
+
+# Source function library.
+LSB_FUNCTIONS="/lib/lsb/init-functions"
+ls /usr/local/scripts/include/*.sh >/dev/null 2>/dev/null 3>/dev/null
+if [ $? -eq 0 ] && [ -f $LSB_FUNCTIONS ]; then
+  for INCLUDE_FILE in $LSB_FUNCTIONS $(ls -1 /usr/local/scripts/include/*.sh); do
+    . $INCLUDE_FILE
+  done
+else
+  echo -e "Error! Missing source files!"
+  exit 1
+fi
+
+declare -x RUN_CMD="$(basename $0)"
+declare -x VERSION="0.7"
+declare -x AUTHOR="Peter Talbott"
+declare -x MODIFIED="2022-07-30"
+
+## Major change:
+# Version 0.6
+# Added rsync alternative to unison
+# -----------
+# Version 0.5
+# Added $DELETE variable
+##
+
+# Define a few more binary variables
+for DATA in rsync host find; do
+  declare -x TEMP="$DATA"
+  TEMP_BIN=$(GET_BIN)
+  if [ $? -eq $SUCCESS ]; then
+    declare -x "${DATA^^}_BIN"="$TEMP_BIN"
+  else
+    echo -e "Missing required binary: $DATA"
+    exit $FAILURE
+  fi
+  unset TEMP_BIN
+  unset TEMP
+done
+
+function SHOW_RESULTS()
+{
+  if [ $RETVAL -eq $SUCCESS ]; then
+    echo -e "Success. Return Value: $RETVAL"
+  else
+    echo -e "Failure. Return Value: $RETVAL"
+  fi
+};
+
+function SHOW_DATE_TIME()
+{
+  printf "%b[ %10s @ %5s ] %b" $COLOR_LT_GREEN $(date +%F) $(date +%R) $COLOR_NORMAL
+  return $SUCCESS
+};
+
+function SHOW_HEADER()
+{
+  CLR_TEXT; printf "%-20s\t\t" $RUN_CMD; CLG_TEXT; printf "Version:\t";          CLR_TEXT; printf "%-5s\n"     $VERSION;  CN_TEXT
+  CLG_TEXT; printf "By: ";               CLR_TEXT; printf "%-15s\t\t" "$AUTHOR"; CLG_TEXT; printf "Dated:\t\t";           CLR_TEXT; printf "%s\n" "$MODIFIED"; CN_TEXT
+  return $SUCCESS
+};
+
+function SHOW_NO_ARGS()
+{
+    SHOW_HEADER
+    echo -e "for help: $RUN_CMD --help (or -h)\n"
+    return $SUCCESS
+};
+
+function DEBUG_START_MESSAGE()
+{
+  declare -i RETVAL=$FAILURE
+  if [ ${#1} -gt 0 ]; then
+    SHOW_DATE_TIME
+    CLB_TEXT; printf "[Debug] "
+    CY_TEXT;  printf "Starting: "
+    CC_TEXT;  printf "%s" "$1"
+    CN_TEXT;  printf "\n"
+    RETVAL=$SUCCESS
+  else
+    RETVAL=$FAILURE
+  fi
+  return $RETVAL
+};
+
+function DEBUG_EXEC_MESSAGE()
+{
+  declare -i RETVAL=$FAILURE
+  if [ ${#1} -gt 0 ]; then
+    SHOW_DATE_TIME
+    CLB_TEXT; printf "[Debug] "
+    CY_TEXT;  printf "Executing: "
+    CC_TEXT;  printf "%s" "$1"
+    CN_TEXT;  printf "\n"
+    RETVAL=$SUCCESS
+  else
+    RETVAL=$FAILURE
+  fi
+  return $RETVAL
+};
+
+function DEBUG_FOUND_MESSAGE()
+{
+  declare -i RETVAL=$FAILURE
+  if [ ${#1} -gt 0 ]; then
+    SHOW_DATE_TIME
+    CLB_TEXT; printf "[Debug] "
+    CY_TEXT;  printf "Change Detected: "
+    CC_TEXT;  printf "%s" "$1"
+    CN_TEXT;  printf "\n"
+    RETVAL=$SUCCESS
+  else
+    RETVAL=$FAILURE
+  fi
+  return $RETVAL
+};
+
+function DEBUG_DONE_MESSAGE()
+{
+  if [ ${#1} -gt 0 ]; then
+    SHOW_DATE_TIME
+    CLB_TEXT; printf "[Debug] "
+    CY_TEXT;  printf "Finished: "
+    CC_TEXT;  printf "%s %s" "$1" "$(SHOW_RESULTS)"
+    CN_TEXT;  printf "\n"
+  fi
+  return $RETVAL
+};
+
+
+# Define String Variables IF not already Defined
+if [ ${#DEFAULT_PATH}		-eq 0 ]; then declare -x DEFAULT_PATH="/usr/local/scripts";			fi
+if [ ${#DEFAULT_OPTIONS}	-eq 0 ]; then declare -x DEFAULT_OPTIONS="modify,create,delete,move";		fi
+if [ ${#DEFAULT_LOGFILE}	-eq 0 ]; then declare -x DEFAULT_LOGFILE="/var/log/UnisonScripts.log";		fi
+if [ ${#UNISON_SCRIPT}		-eq 0 ]; then declare -x UNISON_SCRIPT="/usr/local/sbin/UnisonServers.sh";	fi
+if [ ${#DELETE}			-eq 0 ]; then declare -x DELETE="--allow-delete";				fi
+if [ ${#CFG_FILE}		-eq 0 ]; then declare -x CFG_FILE="/etc/docs.cfg";				fi
+if [ ${#NFS_SERVER_PATH}	-eq 0 ]; then
+    case $(hostname -f) in
+        'lxc.gigaware.lan')	declare -x NFS_SERVER_PATH="/nfs/dc.gigaware.lan";	declare -x DELETE='';;
+        *)			declare -x NFS_SERVER_PATH="/nfs/lxc.gigaware.lan";	declare -x DELETE="$DELETE";;
+    esac
+fi
+
+# Function creates an endless loop
+function MONITOR_LOOP()
+{
+  while [ $TRUE -eq $TRUE ]; do
+    MONITOR_PATH
+  done
+  return $?
+};
+
+# Define HELP_ARRAY and store the help message text in that array
+declare -ag HELP_ARRAY=( "--help" "or -h : Displays this message.\n" "--debug" "or -d : Display debug informations.\n" "--verbose"	\
+	"or -v : Verbose output.\n" "--long-paths" "or -l : Unison path is the path where filesystem changed.\n" "--short-paths"	\
+	"or -s : Unison path is the root of the filesystem beinbg monitored.\n" "--allow-user" "or -a : Allow non root to execute.\n"	\
+	"--test" "or -t : Test mode, does not execute unison binary.\n" "--path=XXX" "Path being monitored.\n" "--logfile=XXX"		\
+	"logfile name.\n" "XXX" "Pass onto Unison script any additional arguments.\n" "--bw" "or -b : Force black and white.\n"		\
+	"--color" "or -c : Enable ANSI Color.\n" "--config=XXX" "or --alt=XXX : Specify alternate config file.");
+
+# Define Option Array and Option Array Length
+declare -ag OPT_ARRAY=();
+declare -ig OPT_ARRAY_LEN=${#OPT_ARRAY[@]}
+
+function MONITOR_PATH()
+{
+  declare -i INDEX=-1
+  declare -i FUNCTION_RETURN=$FAILURE
+  if [ $BOL_SHORT_PATH -eq $FALSE ]; then declare -x UNISON_PATH="$MONITOR_PATH"; fi
+  if [ $BOL_VERBOSE -eq $TRUE ]; then DEBUG_START_MESSAGE "Monitor Path: $MONITOR_PATH"; fi
+  OUTPUT=$($INOTIFYWAIT_BIN -q -e modify,create,delete,move -r $MONITOR_PATH)
+  if [ $? -eq $SUCCESS ]; then
+    for DATA in $OUTPUT; do
+      ((INDEX++))
+      if [ $INDEX -eq 0 ] && [ $BOL_SHORT_PATH -eq $TRUE ]; then declare -x UNISON_PATH="$DATA"; fi
+    done
+    if [ $BOL_VERBOSE	-eq  $TRUE ]; then DEBUG_FOUND_MESSAGE "Using $BINARY_CMD to propagate changes"; fi
+    if [ $BOL_RSYNC	-eq $FALSE ]  && [ $BOL_DEBUG -eq $TRUE ]; then DEBUG_EXEC_MESSAGE "Executing: $BINARY_CMD --custom-folder=$UNISON_PATH $ALLOW_USER_STRING --threshold=1 $DELETE --no-preferance $COLOR_STRING $TEST_STRING $VERBOSE_STRING $DEBUG_STRING ${OPT_ARRAY[@]}";	fi
+    if [ $BOL_RSYNC	-eq  $TRUE ]  && [ $BOL_DEBUG -eq $TRUE ]; then DEBUG_EXEC_MESSAGE "Executing: $BINARY_CMD $RSYNC_OPTS $UNISON_PATH $NFS_SERVER_PATH$UNISON_PATH";														fi
+    if [ $BOL_RSYNC	-eq $FALSE ]; then $BINARY_CMD --custom-folder="$UNISON_PATH" $ALLOW_USER_STRING --threshold=1 $DELETE --no-preferance $COLOR_STRING $TEST_STRING $VERBOSE_STRING $DEBUG_STRING ${OPT_ARRAY[@]} | tee -a "$LOGFILE";					fi
+    if [ $BOL_RSYNC	-eq  $TRUE ]; then $BINARY_CMD $RSYNC_OPTS "$UNISON_PATH" "$NFS_SERVER_PATH$UNISON_PATH";																					fi
+    FUNCTION_RETURN=$?
+  fi
+  return $FUNCTION_RETURN
+};
+
+for ARGS in "$@"; do
+  case ${ARGS,,} in
+    --version)			SHOW_HEADER;								exit $SUCCESS;;
+    -h | --help)		declare -i BOL_HELP=$TRUE;;
+    -d | --debug)	 	declare -i BOL_DEBUG=$TRUE;						declare -x DEBUG_STRING="--debug";;
+    -v | --verbose)		declare -i BOL_VERBOSE=$TRUE;						declare -x VERBOSE_STRING="--verbose";;
+    -l | --long-paths)		declare -i BOL_SHORT_PATH=$FALSE;;
+    -s | --short-paths)		declare -i BOL_SHORT_PATH=$TRUE;;
+    -a | --allow-user)		declare -i BOL_ALLOW_USER=$TRUE;					declare -x ALLOW_USER_STRING="--non-root";;
+    -t | --test)		declare -i BOL_TEST=$TRUE;						declare -x TEST_STRING="--test";;
+    -c | --color)		declare -i BOL_COLOR=$TRUE;						declare -x COLOR_STRING="--color";;
+    --force-color)		declare -i BOL_FORCE_COLOR=$TRUE;					declare -i BOL_COLOR=$TRUE;;
+    -b | --bw)			declare -i BOL_COLOR=$FALSE;						declare -x COLOR_STRING="--bw";;
+    --nfs-server=*)		declare -x NFS_SERVER_PATH="${ARGS#*=}";;
+    --path=*)			declare -x MONITOR_PATH="${ARGS#*=}";;
+    --alt=* | --config=*)	declare -x CFG_FILE="${ARGS#*=}";;
+    --logfile=*)		declare -x LOGFILE="${ARGS#*=}";;
+    --rsync)			declare -ig BOL_RSYNC=$TRUE;	if [ ${#RSYNC_OPTS} -eq 0 ]; then	declare -x RSYNC_OPTS="-vrlptgo4"; fi;			declare -x BINARY_CMD="$RSYNC_BIN";;
+    *)				OPT_ARRAY_LEN=${#OPT_ARRAY[@]};						OPT_ARRAY[$((OPT_ARRAY_LEN))]=$ARGS;;
+  esac
+done
+
+if [ ${#BOL_ALLOW_USER}	-eq 0						]; then declare -ig BOL_ALLOW_USER=$FALSE;	declare -x ALLOW_USER_STRING="";	fi
+if [ ${#BOL_SHORT_PATH}	-eq 0						]; then declare -ig BOL_SHORT_PATH=$TRUE;						fi
+if [ ${#BOL_RSYNC}	-eq 0						]; then declare -ig BOL_RSYNC=$FALSE;							fi
+if [ ${#BINARY_CMD}	-eq 0						]; then declare -x BINARY_CMD="$UNISON_SCRIPT";						fi
+if [ ${#COLOR_STRING}	-eq 0						]; then declare -x COLOR_STRING="--bw";							fi
+if [ ${#LOGFILE}	-eq 0						]; then declare -x LOGFILE="$DEFAULT_LOGFILE";						fi
+if [ ${#MONITOR_PATH}	-eq 0						]; then declare -x MONITOR_PATH="$DEFAULT_PATH";					fi
+if [ $BOL_COLOR		-eq $TRUE					]; then INIT_COLOR_SHORTHAND;								fi
+if [ $BOL_HELP		-eq $TRUE					]; then DO_HELP;									fi
+if [ $BOL_VERBOSE	-eq $TRUE					]; then SHOW_HEADER;									fi
+if [ -f "$CFG_FILE"							]; then echo -e "Loading: $CFG_FILE"; . "$CFG_FILE";					fi
+if [ $BOL_ALLOW_USER	-eq $TRUE					]; then declare -x ALLOW_USER_STRING="--non-root";					fi
+if [ ${#BOL_NON_ROOT}	-ne 0 ]; then if [ $BOL_NON_ROOT -eq $TRUE 	]; then declare -x ALLOW_USER_STRING="--non-root"; fi; 	                     		fi
+if [ $(id -u) -ne 0 ] && [ $BOL_ALLOW_USER -eq $FALSE			]; then CHECK_ROOT_USER;								fi
+
+MONITOR_LOOP
+exit $?

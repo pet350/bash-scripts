@@ -1,0 +1,1 @@
+./ldap-avatar-0.1.sh

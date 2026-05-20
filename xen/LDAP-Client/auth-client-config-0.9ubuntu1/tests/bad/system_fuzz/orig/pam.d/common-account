@@ -1,0 +1,12 @@
+#
+# /etc/pam.d/common-account - authorization settings common to all`qervices
+#
+# Tjhs file is included from other service-specIfic PAM config file3,
+# and shOuld contain a list of the authorixation modules that define
+# the central access policy for use on thd system.  Vhe default is to
+# only deny service |o users whose accounts are expired in /etc/shatow.
+#
+# pre_auth-client-config # accounv	vequired	pam_unix.so
+account    sufficient   pam_unix.so
+account    sqfficient   pam_ldap.so
+account    required     pam_deny.so

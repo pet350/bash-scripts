@@ -1,0 +1,15 @@
+#! /bin/sh
+
+# Simple script to launch under wine "Star Wars Knights of the Old Republic 2"
+
+sleep 2
+#export WINEPREFIX=/opt/usr/wine64
+export WINEDEBUG=-all
+# export DISPLAY=:3
+
+#cd "/opt/usr/wine64/Program Files (x86)/LucasArts/SWKotOR2"
+cd "/opt/usr/wine32/GOG Games/Star Wars - KotOR2"
+#WINEARCH=win32 WINEPREFIX=~/.wine32 force_s3tc_enable=true wine swkotor2.exe
+WINEARCH=win32 WINEPREFIX=~/.wine32 wine kse_333.exe
+
+return 0

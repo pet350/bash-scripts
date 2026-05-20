@@ -1,0 +1,90 @@
+TESTING ARGS (-a with -t)
+
+Cannot specify 'type' when using 'apply all'
+
+TESTING ARGS (no -p)
+
+'profile' is required
+
+
+'profile' is required
+
+TESTING ARGS (no -a or -t)
+
+either '-t' or '-a' is required
+
+TESTING ARGS (-t without arg)
+
+Invalid type in '-n'. Valid types are:
+  nss
+  pam-password
+  pam-auth
+  pam-session
+  pam-account
+
+TESTING ARGS (-f without arg)
+'-n' does not exist
+
+--
+Errors found.  Aborting (no changes made)
+TESTING ARGS (-f with non-existent)
+'non-existent' does not exist
+
+--
+Errors found.  Aborting (no changes made)
+TESTING ARGS (-f with long path)
+'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.toolong' does not exist
+
+--
+Errors found.  Aborting (no changes made)
+TESTING ARGS (-a with -f)
+
+Cannot specify 'file' when using 'apply all'
+
+TESTING ARGS (invalid args)
+Usage: auth-client-config -p PROFILE -a -t TYPE [-dn -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -r [-n -f FILE]
+       auth-client-config -p PROFILE -a -t TYPE -s [-f FILE]
+
+auth-client-config: error: no such option: -Z
+TESTING ARGS (-t with commas)
+
+Invalid type in 'pam-auth,'. Valid types are:
+  nss
+  pam-password
+  pam-auth
+  pam-session
+  pam-account
+
+
+Invalid type in ',pam-password'. Valid types are:
+  nss
+  pam-password
+  pam-auth
+  pam-session
+  pam-account
+
+
+Invalid type in 'pam-auth,,pam_password'. Valid types are:
+  nss
+  pam-password
+  pam-auth
+  pam-session
+  pam-account
+
+
+Invalid type in 'pam-auth,pam-foo'. Valid types are:
+  nss
+  pam-password
+  pam-auth
+  pam-session
+  pam-account
+
+
+Invalid type in 'pam-foo,pam-password'. Valid types are:
+  nss
+  pam-password
+  pam-auth
+  pam-session
+  pam-account
+

@@ -1,0 +1,40 @@
+TESTING INDIVIDUAL
+Error in resetting 'nss': 'ldap' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-account': 'ldap' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-auth': 'ldap' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-password': 'ldap' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+Error in resetting 'pam-session': 'ldap' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+TESTING ALL
+Error in resetting 'nss': 'ldap' does not match system settings
+--
+Errors found.  Aborting (no changes made)
+TESTING INDIVIDUAL (dbonly)
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+
+Cannot specify 'database-only' when using 'reset'
+
+TESTING ALL (dbonly)
+
+Cannot specify 'database-only' when using 'reset'
+

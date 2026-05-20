@@ -1,0 +1,1 @@
+/opt/dev/aiterm/0.3/key

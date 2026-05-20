@@ -1,0 +1,11 @@
+# if pam-runtime and base-files start to use auth-client-config, can perhaps
+# uncomment this
+[local_example]
+nss_passwd=passwd: compat
+nss_group=group: compat
+nss_shadow=shadow: compat
+nss_netgroup=netgroup: nis
+pam_auth=auth    required        pam_unix.so nullok_secure debug
+pam_account=account required        pam_unix.so
+pam_password=password   required   pam_unix.so nullok obscure min=4 max=8 md5
+pam_session=session required        pam_unix.so

@@ -1,0 +1,1 @@
+./wine32regedit-0.1.sh

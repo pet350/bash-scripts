@@ -1,0 +1,427 @@
+#!/bin/bash
+# Script to setup Open vSwitch System Configurations
+# Loads Configuration File(s) Stored in: /etc/network/config.d
+# By: Peter Talbott
+
+# Source LSB function library.
+source /lib/lsb/init-functions
+
+export RUN_CMD="$(basename $0)"
+_VER=0.4
+
+if [ $(id -u) -gt 0 ]; then
+    echo -e "Must be ran as Root!!"
+    exit 1
+fi
+
+if [ $# -eq 0 ]
+  then
+    echo -e "$RUN_CMD Version $_VER\nUsage: $RUN_CMD {start|stop|restart}"
+    exit 1
+fi
+
+# Source function library for storing XEN info
+source /usr/local/src/xen-scripts.sh
+
+export PREFIX="/etc/network/config.d"
+
+# Define Binary Prefixes
+export OVS_PREFIX="/usr/bin"
+export IP_PREFIX="/bin"
+
+# Define Execuatable Binaries
+export OVS_BIN="$OVS_PREFIX/ovs-vsctl"
+export IP_BIN="$IP_PREFIX/ip"
+
+# Define Global TRUE/FALSE Variables
+declare -ig TRUE=1
+declare -ig FALSE=0
+
+# Define Global SUCCESS/FAILURE Variables
+declare -ig SUCCESS=0
+declare -ig FAILURE=1
+
+# Define Global Arrays
+declare -ag DATA_ARRAY=();
+declare -ag NET_IFACE_ARRAY=();
+
+# Define Global BOOLEAN Variables
+declare -ig BOL_START=$FALSE
+declare -ig BOL_STOP=$FALSE
+declare -ig BOL_RUN=$FALSE
+declare -ig BOL_VERBOSE=$FALSE
+declare -ig BOL_HELP=$FALSE
+declare -ig BOL_DHCP_RESTART=$FALSE
+declare -ig BOL_MAKE_BRIDGE=$FALSE
+declare -ig BOL_BRIDGE=$FALSE
+declare -ig BOL_BOND=$FALSE
+declare -ig BOL_IP_ADDRESS=$FALSE
+declare -ig BOL_BCAST_ADDRESS=$FALSE
+declare -ig BOL_DEFAULT_GATEWAY=$FALSE
+declare -ig BOL_NET_IFACE=$FALSE
+declare -ig BOL_BOND_IFACE=$FALSE
+declare -ig BOL_BRIDGE_IFACE=$FALSE
+declare -ig BOL_BCAST_ADDRESS=$FALSE
+declare -ig BOL_UNKNOWN=$FALSE
+declare -ig BOL_DHCP_DIRECTIVE=$FALSE
+
+# Define Global Interger Variables
+declare -ig VAR_UNKNOWN=0
+declare -ig VAR_WAIT=1
+declare -ig INDEX=-1
+declare -ig NET_IFACE_INDEX=-1
+declare -ig RETVAL=$FAILURE
+
+# Function That Resets All Loop Variables
+function INITIALIZE_LOOP_VARIABLES()
+{
+  export DATA=""
+  export BOND_IFACE=""
+  export BRIDGE_IFACE=""
+  export NETWORK_IFACE=""
+  export OPTION_DATA=""
+  export IP_ADDRESS=""
+  export BROADCAST_ADDRESS=""
+  export DEFAULT_GATEWAY=""
+  export BCAST_ADDRESS=""
+  export DHCP_DIRECTIVE=""
+
+  export BOL_BRIDGE=$FALSE
+  export BOL_BOND=$FALSE
+  export BOL_BOL_IP_ADDRESS=$FALSE
+  export BOL_DEFAULT_GATEWAY=$FALSE
+  export BOL_BCAST_ADDRESS=$FALSE
+  export BOL_NET_IFACE=$FALSE
+  export BOL_BOND_IFACE=$FALSE
+  export BOL_BRIDGE_IFACE=$FALSE
+  export BOL_BCAST_ADDRESS=$FALSE
+  export BOL_DHCP_DIRECTIVE=$FALSE
+  export BOL_MAKE_BRIDGE=$FALSE
+
+  export INDEX=-1
+  export NET_IFACE_INDEX=-1
+
+  return $SUCCESS
+};
+
+function makeBRIDGE()
+{
+  if [ $BOL_VERBOSE -eq $TRUE ]; then
+    echo -e "$OVS_BIN add-br $BRIDGE_IFACE"
+  fi
+  $OVS_BIN add-br $BRIDGE_IFACE
+
+  if [ $BOL_VERBOSE -eq $TRUE ]; then
+    echo -e "$OVS_BIN set bridge $BRIDGE_IFACE $OPTION_DATA"
+  fi
+  $OVS_BIN set bridge $BRIDGE_IFACE $OPTION_DATA
+
+  if [ $BOL_BOND -eq $TRUE ]; then
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+      echo -e "$OVS_BIN add-bond $BRIDGE_IFACE $BOND_IFACE $NETWORK_IFACE"
+    fi
+    $OVS_BIN add-bond $BRIDGE_IFACE $BOND_IFACE $NETWORK_IFACE
+    RETVAL=$?
+  elif [ $BOL_BRIDGE -eq $TRUE ]; then
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+      echo -e "$OVS_BIN add-port $BRIDGE_IFACE $NETWORK_IFACE"
+    fi
+    $OVS_BIN add-port $BRIDGE_IFACE $NETWORK_IFACE
+    RETVAL=$?
+  else
+    RETVAL=$FAILURE
+  fi
+
+  for ETH_TEMP in ${NET_IFACE_ARRAY[@]}; do
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+      echo -e "$IP_BIN link set $ETH_TEMP up"
+    fi
+    $IP_BIN link set $ETH_TEMP up
+  done
+
+  if [ $BOL_IP_ADDRESS -eq $TRUE ]; then
+    if [ $BOL_BCAST_ADDRESS -eq $TRUE ]; then
+      if [ $BOL_VERBOSE -eq $TRUE ]; then
+        echo -e "$IP_BIN addr add $IP_ADDRESS broadcast $BCAST_ADDRESS dev $BRIDGE_IFACE"
+      fi
+    $IP_BIN addr add $IP_ADDRESS broadcast $BCAST_ADDRESS dev $BRIDGE_IFACE
+    else
+      if [ $BOL_VERBOSE -eq $TRUE ]; then
+        echo -e "$IP_BIN addr add $IP_ADDRESS dev $BRIDGE_IFACE"
+      fi
+      $IP_BIN addr add $IP_ADDRESS dev $BRIDGE_IFACE
+    fi
+  fi
+
+  if [ $BOL_DEFAULT_GATEWAY -eq $TRUE ]; then
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+      echo -e "$IP_BIN route add default via $DEFAULT_GATEWAY dev $BRIDGE_IFACE"
+    fi
+    $IP_BIN route add default via $DEFAULT_GATEWAY dev $BRIDGE_IFACE
+  fi
+
+  if [ $BOL_VERBOSE -eq $TRUE ]; then
+    echo -e "$IP_BIN link set $BRIDGE_IFACE up"
+  fi
+  $IP_BIN link set $BRIDGE_IFACE up
+  RETVAL=$?
+  sleep $VAR_WAIT
+  return $RETVAL
+};
+
+function PARSE_DATA_ARRAY()
+{
+  NET_IFACE_ARRAY=();
+  INITIALIZE_LOOP_VARIABLES
+  if [ $BOL_VERBOSE -eq $TRUE ]; then
+    echo -e "\nParsing Configuration File: $PREFIX/$LIST"
+  fi
+
+  for DATA in ${DATA_ARRAY[@]}; do
+    ((INDEX++))
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+        echo -e "Index: $INDEX\tDATA: $DATA"
+    fi
+    case $DATA in
+    'DHCP-RESTART="YES"' | 'dhcp-restart="yes"')
+        DHCP_DIRECTIVE="Yes"
+        BOL_DHCP_RESTART=$TRUE
+        BOL_DHCP_DIRECTIVE=$TRUE
+        ;;
+    'DHCP-RESTART="NO"' | 'dhcp-restart="no"')
+        DHCP_DIRECTIVE="No"
+        BOL_DHCP_RESTART=$FALSE
+        BOL_DHCP_DIRECTIVE=$TRUE
+        ;;
+    NETWORK-INTERFACE=* | network-interface=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        NETWORK_IFACE="$NETWORK_IFACE $TEMP_DATA "
+        ip addr flush $TEMP_DATA
+        ((NET_IFACE_INDEX++))
+        NET_IFACE_ARRAY[$((NET_IFACE_INDEX))]="$TEMP_DATA"
+        BOL_NET_IFACE=$TRUE
+        ;;
+    BOND-INTERFACE=* | bond-interface=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        BOND_IFACE="$BOND_IFACE $TEMP_DATA "
+        BOL_BOND_IFACE=$TRUE
+        ;;
+    OPTION=* | option=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        OPTION_DATA="$OPTION_DATA $TEMP_DATA "
+        ;;
+    BRIDGE-INTERFACE=* | bridge-interface=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        BRIDGE_IFACE="$BRIDGE_IFACE $TEMP_DATA "
+        BOL_BRIDGE_IFACE=$TRUE
+        ;;
+    IP-ADDRESS=* | ip-address=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        IP_ADDRESS="$TEMP_DATA"
+        BOL_IP_ADDRESS=$TRUE
+        ;;
+    BROADCAST=* | broadcast=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        BCAST_ADDRESS="$TEMP_DATA"
+        BOL_BCAST_ADDRESS=$TRUE
+        ;;
+    DEFAULT-GATEWAY=* | default-gateway=*)
+        TEMP_DATA="${DATA#*=}"
+        TEMP_DATA=`echo $TEMP_DATA | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+        DEFAULT_GATEWAY="$TEMP_DATA"
+        BOL_DEFAULT_GATEWAY=$TRUE
+        ;;
+    'BOND="YES"' | 'bond="yes"')
+        BOL_BOND=$TRUE
+        ;;
+    'BOND="NO"' | 'bond="no"')
+        BOL_BOND=$FALSE
+        ;;
+    'BRIDGE="YES"' | 'bridge="yes"')
+        BOL_BRIDGE=$TRUE
+        ;;
+    'BRIDGE="NO"' | 'bridge="no"')
+        BOL_BRIDGE=$FALSE
+        ;;
+    *)
+        BOL_UNKNOWN=$TRUE
+        ;;
+    esac
+  done
+  if [ $BOL_VERBOSE -eq $TRUE ]; then
+    echo -e "Applying Configuration File: $PREFIX/$LIST\n"
+  fi
+  return $SUCCESS
+};
+
+function do_START()
+{
+  declare -a DATA_ARRAY=();
+  declare -a NET_IFACE_ARRAY=();
+
+  declare -i INDEX=-1
+  declare -i NET_IFACE_INDEX=-1
+
+  if [ $( ls -1 $PREFIX | wc -l) -eq 0 ]; then
+    echo "Error! No Config Files Found In $PREFIX!"
+    RETVAL=$FAILURE
+  else
+    for LIST in $(ls -1 $PREFIX); do
+      INDEX=-1
+      DATA_ARRAY=();
+      for DATA in $(cat $PREFIX/$LIST); do
+	((INDEX++))
+	DATA_ARRAY[$((INDEX))]="$DATA"
+      done
+
+      NET_IFACE_ARRAY=();
+      PARSE_DATA_ARRAY
+
+      if [ $BOL_BRIDGE_IFACE -eq $TRUE ]; then
+	if [ $BOL_NET_IFACE -eq $TRUE ]; then
+	  BOL_MAKE_BRIDGE=$TRUE
+        fi
+      fi
+
+      if [ $BOL_UNKNOWN -eq $TRUE ]; then
+        BOL_MAKE_BRIDGE=$FALSE
+        RETVAL=$FAILURE
+      fi
+
+
+      if [ $BOL_DHCP_DIRECTIVE -eq $TRUE ]; then
+        BOL_MAKE_BRIDGE=$FALSE
+      fi
+
+      if [ $BOL_MAKE_BRIDGE -eq $TRUE ]; then
+	makeBRIDGE
+      fi
+
+      if [ $BOL_VERBOSE -eq $TRUE ]; then
+        echo -e "Done Applying Configuration File: $PREFIX/$LIST\n"
+      fi
+
+    done
+  fi
+  return $RETVAL
+};
+
+
+function do_STOP()
+{
+  declare -i PORT_COUNT=255
+  declare -i RETVAL=$FALURE
+
+  for LIST in $(ls -1 $PREFIX); do
+    for DATA in $(cat $PREFIX/$LIST); do
+      ((INDEX++))
+      DATA_ARRAY[$((INDEX))]="$DATA"
+    done
+  done
+
+  PARSE_DATA_ARRAY
+
+  for BRIDGE_LIST in $( $OVS_BIN list-br ); do
+    PORT_COUNT=$( $OVS_BIN list-ports $BRIDGE_LIST | wc -l )
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+      echo -e "Stopping $((PORT_COUNT-1)) Port(s) on Bridge $BRIDGE_LIST"
+    fi
+    while [ $PORT_COUNT -gt 1 ]; do
+      for TEMP_PORT in $( $OVS_BIN list-ports $BRIDGE_LIST ); do
+	CURRENT_PORT="$TEMP_PORT"
+      done
+      if [ $BOL_VERBOSE -eq $TRUE ]; then
+	echo -e "Stopping Port #$((PORT_COUNT-1)): $CURRENT_PORT"
+      fi
+      $IP_BIN link set $CURRENT_PORT down
+      $OVS_BIN del-port $BRIDGE_LIST $CURRENT_PORT
+      PORT_COUNT=$( $OVS_BIN list-ports $BRIDGE_LIST | wc -l )
+    done
+    $OVS_BIN del-br $BRIDGE_LIST
+  done
+
+  for IFACE in ${NET_IFACE_ARRAY[@]}; do
+    if [ $BOL_VERBOSE -eq $TRUE ]; then
+      echo -e "$IP_BIN link set $IFACE down"
+    fi
+    $IP_BIN link set $IFACE down
+  done
+
+  BOL_DHCP_RESTART=$FALSE
+  RETVAL=$?
+  return $RETVAL
+};
+
+for i in "$@"
+do
+case $i in
+'start')
+	export BOL_STOP=$FALSE
+        export BOL_START=$TRUE
+        ;;
+'stop')
+	export BOL_STOP=$TRUE
+	export BOL_START=$FALSE
+	;;
+'restart')
+	export BOL_STOP=$TRUE
+	export BOL_START=$TRUE
+	;;
+'-v' | '--verbose')
+	export VERBOSE="--verbose"
+        export BOL_VERBOSE=$TRUE
+        ;;
+'-h' | '--help')
+	export BOL_HELP=$TRUE
+	;;
+*)
+        (( VAR_UNKNOWN++ ))
+	echo -e "Unknown Parameter $i"
+        ;;
+esac
+done
+
+if [ $BOL_HELP -eq $TRUE ]; then
+        BOL_START=$FALSE
+        BOL_STOP=$FALSE
+	#do_HELP
+        RETVAL=1
+fi
+
+if [ $VAR_UNKNOWN -gt 0 ]; then
+	BOL_START=$FALSE
+	BOL_STOP=$FALSE
+	RETVAL=$VAR_UNKNOWN
+fi
+
+if [ $BOL_STOP -eq $TRUE ]; then
+        log_daemon_msg "Stopping $RUN_CMD"
+        do_STOP
+        RETVAL=$?
+fi
+
+if [ $BOL_START -eq $TRUE ]; then
+        log_daemon_msg "Starting $RUN_CMD"
+	do_START
+	RETVAL=$?
+fi
+
+if [ $BOL_DHCP_RESTART -eq $TRUE ]; then
+	sleep $VAR_WAIT
+	/etc/init.d/isc-dhcp-server restart
+fi
+
+if [ $((RETVAL)) = $((SUCCESS)) ]; then
+        log_success_msg "OK!"
+else
+	log_failure_msg "FAIL!"
+fi
+
+exit $RETVAL
+## Done!

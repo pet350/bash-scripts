@@ -1,0 +1,142 @@
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:          Mount-SQL-Data-Disk
+# Required-Start:    $local_fs $syslog
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Prepare SQL Data Disk
+# Description:       Prepare SQL Data Disk
+### END INIT INFO
+# chkconfig: 2345 12 05
+### By: Peter Talbott 2019-04-01
+
+# Source function library.
+source /lib/lsb/init-functions
+
+if [ -f /usr/local/scripts/include/*.sh ]; then
+  for INCLUDE_FILE in $(ls -1 /usr/local/scripts/include/*.sh); do
+    . $INCLUDE_FILE
+  done
+fi
+
+
+export RUN_CMD="$(basename $0)"
+
+if [ $(id -u) -gt 0 ]; then
+    echo "Must be ran as root"
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $RUN_CMD { start | stop } --help"
+    exit 1
+fi
+
+export version="0.1"
+export VERBOSE=""
+export DEV_NAME="sql.data"
+export DEVICE="$(blkid --label $DEV_NAME)"
+export TARGET="/var/opt"
+export OWNER="mysql"
+export GROUP="mysql"
+export MOUNT_BIN="/bin/mount"
+export MOUNT_OPTION=""
+
+declare -ig _BOL_START=$FALSE
+declare -ig _BOL_STOP=$FALSE
+declare -ig _BOL_VERBOSE=$FALSE
+declare -ig _BOL_HELP=$FALSE
+declare -ig _VAR_UNKNOWN=$FALSE
+
+function do_START()
+{
+    declare -i RETVAL=$FAILURE
+    if [ ! -d $TARGET ]; then mkdir -p $TARGET; fi
+    if [ $BOL_VERBOSE -eq $TRUE ]; then echo -e "\nExecuting: $MOUNT_BIN $MOUNT_OPTION $DEVICE $TARGET $VERBOSE"; fi
+    $MOUNT_BIN $MOUNT_OPTION $DEVICE $TARGET $VERBOSE
+    RETVAL=$?
+    if [ $RETVAL -eq $SUCCESS ]; then chown $OWNER:$GROUP $TARGET $VERBOSE; fi
+    return $RETVAL
+};
+
+function do_STOP()
+{
+    declare -i RETVAL=$FAILURE
+    umount $TARGET
+    return $?
+};
+
+function do_HELP()
+{
+	printf "HELP! %-7s\tversion: %-4s\n" "$RUN_CMD" "$version"
+	printf "%-15s\t\t%-25s\n" "-h or --help" "Disply This Help Message"
+        printf "%-15s\t\t%-25s\n" "start" "Mount SQL Data Disk"
+        printf "%-15s\t\t%-25s\n" "stop" "Unmount SQL Data Disk"
+        printf "%-15s\t\t%-25s\n" "-v or --verbose" "Be Verbose"
+};
+
+for i in "$@"
+do
+case $i in
+'-h' | '--help')
+	export _BOL_HELP=$TRUE
+	export _BOL_START=$FALSE
+	export _BOL_STOP=$FALSE
+	;;
+'start')
+        export _BOL_START=$TRUE
+	export _BOL_STOP=$FALSE
+        ;;
+'stop')
+	export _BOL_START=$FALSE
+	export _BOL_STOP=$TRUE
+	;;
+'restart')
+	export _BOL_STOP=$TRUE
+	export _BOL_START=$TRUE
+	;;
+'-v' | '--verbose')
+	export VERBOSE="--verbose"
+        export _BOL_VERBOSE=$TRUE
+	;;
+*)
+        (( _VAR_UNKNOWN++ ))
+	echo -e "Unknown Parameter $i"
+        ;;
+esac
+done
+
+if [ $_BOL_HELP -eq $TRUE ]; then
+        _BOL_START=$FALSE
+        _BOL_STOP=$FALSE
+	do_HELP
+        RETVAL=$FAILURE
+fi
+
+if [ $_VAR_UNKNOWN -gt 0 ]; then
+	_BOL_START=$FALSE
+	_BOL_STOP=$FALSE
+	RETVAL=$_VAR_UNKNOWN
+fi
+
+if [ $_BOL_STOP -eq $TRUE ]; then
+        log_daemon_msg "Stopping $RUNCMD"
+	do_STOP
+	RETVAL=$SUCCESS
+fi
+
+if [ $_BOL_START -eq $TRUE ]; then
+        log_daemon_msg "Starting $RUNCMD"
+	do_START
+	RETVAL=$SUCCESS
+fi
+
+if [ $RETVAL -eq $SUCCESS ]; then
+        log_success_msg "OK!"
+else
+        log_failure_msg "FAIL!"
+fi
+
+## DONE!
+exit $RETVAL

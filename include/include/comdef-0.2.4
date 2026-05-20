@@ -1,0 +1,394 @@
+# Common Definitions Script Include File
+# To simplify script writting, I Use this file for MOST functions
+# that I use on a regualar basis
+# Peter Talbott
+# Version 0.2.3
+
+# Define Command Enetered in at the Terminal
+export RUN_CMD="$(basename $0)"
+export COMDEF_VERSION="0.2.4"
+declare -ig CMD_LINE_COUNT=${#CMDLINE[@]}
+
+# Define TRUE/FALSE Variables
+if [ ${#TRUE}		 -eq 0 ];	then	declare -ig TRUE=1;			fi
+if [ ${#FALSE}		 -eq 0 ];	then	declare -ig FALSE=0;			fi
+
+# Define SUCCESS/FAILURE Variables
+if [ ${#SUCCESS}	 -eq 0 ];	then	declare -ig SUCCESS=0;			fi
+if [ ${#FAIL}		 -eq 0 ];	then	declare -ig FAIL=1;			fi
+if [ ${#FAILURE}	 -eq 0 ];	then	declare -ig FAILURE=1;			fi
+
+# Define UP and DOWN
+if [ ${#UP}		 -eq 0 ];	then	declare -ig UP=1;			fi
+if [ ${#DOWN}		 -eq 0 ];	then	declare -ig DOWN=0;			fi
+
+# Define Global Boolean Variables if they don't already exist
+if [ ${#BOL_VERBOSE}	 -eq 0 ];	then 	declare -ig BOL_VERBOSE=$FALSE;		fi
+if [ ${#BOL_QUIET}	 -eq 0 ];	then	declare -ig BOL_QUIET=$FALSE; 		fi
+if [ ${#BOL_HELP}	 -eq 0 ];	then	declare -ig BOL_HELP=$FALSE;		fi
+if [ ${#BOL_TEMP}	 -eq 0 ];	then	declare -ig BOL_TEMP=$FALSE;		fi
+if [ ${#BOL_DEBUG}	 -eq 0 ];	then	declare -ig BOL_DEBUG=$FALSE;		fi
+if [ ${#BOL_WAIT}	 -eq 0 ];	then	declare -ig BOL_WAIT=$TRUE;		fi
+if [ ${#BOL_LOG_RESULTS} -eq 0 ];	then	declare -ig BOL_LOG_RESULTS=$TRUE;	fi
+if [ ${#BOL_COLOR}	 -eq 0 ];	then	declare -ig BOL_COLOR=$TRUE;		fi
+if [ ${#BOL_FORCE_COLOR} -eq 0 ];	then    declare -ig BOL_FORCE_COLOR=$FALSE;     fi
+if [ ${#BOL_ENABLE_ROOT} -eq 0 ];	then	declare -ig BOL_ENABLE_ROOT=$FALSE;	fi
+
+# Define Global SYSCTL Boolean Variables
+if [ ${#BOL_START}	 -eq 0 ];	then	declare -ig BOL_START=$FALSE;		fi
+if [ ${#BOL_STOP}	 -eq 0 ];	then	declare -ig BOL_STOP=$FALSE;		fi
+if [ ${#BOL_RESTART}	 -eq 0 ];	then	declare -ig BOL_RESTART=$FALSE;		fi
+if [ ${#BOL_RELOAD}	 -eq 0 ];	then	declare -ig BOL_RELOAD=$FALSE;		fi
+if [ ${#BOL_STATUS}	 -eq 0 ];	then	declare -ig BOL_STATUS=$FALSE;		fi
+if [ ${#BOL_MASK}	 -eq 0 ];	then	declare -ig BOL_MASK=$FALSE;		fi
+if [ ${#BOL_UNMASK}	 -eq 0 ];	then	declare -ig BOL_UNMASK=$FALSE;		fi
+if [ ${#BOL_ENABLE}	 -eq 0 ];	then	declare -ig BOL_ENABLE=$FALSE;		fi
+if [ ${#BOL_DISABLE}	 -eq 0 ];	then	declare -ig BOL_DISABLE=$FALSE;		fi
+
+# Define Directoy Prefix String Variables
+if [ ${#BIN_PREFIX}	 -eq 0 ];	then	export BIN_PREFIX="/bin";		fi
+if [ ${#USR_PREFIX}	 -eq 0 ];	then	export USR_PREFIX="/usr";		fi
+if [ ${#CFG_PREFIX}	 -eq 0 ];	then	export CFG_PREFIX="/etc";		fi
+if [ ${#LIB_PREFIX}	 -eq 0 ];	then	export LIB_PREFIX="/lib";		fi
+if [ ${#RUN_PREFIX}      -eq 0 ];       then    export RUN_PREFIX="/run";               fi
+if [ ${#VAR_PREFIX}	 -eq 0 ];	then	export VAR_PREFIX="/var";		fi
+if [ ${#SBIN_PREFIX}	 -eq 0 ];	then	export SBIN_PREFIX="/sbin";		fi
+if [ ${#LOCAL_PREFIX}	 -eq 0 ];	then	export LOCAL_PREFIX="/local";		fi
+
+# Function that gets the full path of a binary
+function GET_BIN()
+{
+  export FIND_BIN="$BIN_PREFIX/find"
+  declare -i COUNT=-1
+  for DATA in $($FIND_BIN -L $BIN_PREFIX $SBIN_PREFIX $USR_PREFIX$BIN_PREFIX $USR_PREFIX$SBIN_PREFIX $USR_PREFIX$LOCAL_PREFIX$BIN_PREFIX -executable -iname "$TEMP" 2>/dev/null); do
+    ((COUNT++))
+    if [ $COUNT -eq 0 ]; then echo $DATA; fi
+  done
+  unset DATA
+  unset COUNT
+  return $?
+};
+
+# Define an array of all the Binaries to locate and define
+declare -ag CMD_ARRAY=( "blkid" "chmod" "daemon" "false" "fdisk" "ffmpeg" "ffplay" "free" "fsck" "grep" "ifconfig" "insmod" "ip" "ipa" "iptables" "klist" "ldapadd" \
+  "ldapmodify" "ldapsearch" "ldapwhoami" "lsmod" "mencoder" "mkdir" "nmap" "modprobe" "mount" "net" "pgrep" "ping" "ps" "python" "python3" "rapiddisk" "rmdir" "sleep" "swapoff" "swapon"\
+  "systemctl" "tar" "true" "umount" "unison" "virsh" "wc" "wbinfo" "xfs_repair" "xl" "xrandr" );
+
+# Define Commonly Used Binary Variables
+for DATA in ${CMD_ARRAY[@]}; do
+  export TEMP="$DATA"
+  export "${DATA^^}_BIN"=$(GET_BIN)
+  unset TEMP
+done
+
+# Define Exceptions that the above could not handle due to special charecters
+export TEMP="fsck.ext4";        export FSCK_EXT4_BIN=$(GET_BIN)
+export TEMP="ipa-getkeytab";	export IPA_GETKEYTAB_BIN=$(GET_BIN)
+export TEMP="update-rc.d";      export UPDATE_RC_BIN=$(GET_BIN)
+
+# Define more clear definitions of some Binaries
+export LDAP_ADD_BIN=$LDAPADD_BIN
+export LDAP_MODIFY_BIN=$LDAP_MODIFY_BIN
+export LDAP_SEARCH_BIN=$LDAPSEARCH_BIN
+export LDAP_WHOAMI_BIN=$LDAPWHOAMI_BIN
+export SYSCTL_BIN=$SYSTEMCTL_BIN
+export FSCK_XFS_BIN==$XFS_REPAIR_BIN
+
+unset TEMP
+unset COLOR_SUPPORT
+
+# This function will initialize color variables as ANSI escape codes
+function INIT_COLOR()
+{
+  declare -i FUNCTION_RETURN=$FAILURE
+  if [ $BOL_FORCE_COLOR -eq $TRUE ]; then
+    export TEMP_TERM="$TERM"
+    export TERM="xterm-color"
+  fi
+  # Only enable if terminal supports color
+  case $TERM in
+    'xterm-256color' | 'xterm-color')
+      export COLOR_SUPPORT=$TRUE
+      export FUNCTION_RETURN=$SUCCESS
+      if [ ${#COLOR_NORMAL}	-eq 0 ];	then    export COLOR_NORMAL="\033[0m";		fi
+      if [ ${#COLOR_BLACK}	-eq 0 ];        then    export COLOR_BLACK="\033[0;30m";	fi
+      if [ ${#COLOR_RED}	-eq 0 ];        then    export COLOR_RED="\033[0;31m";		fi
+      if [ ${#COLOR_GREEN}	-eq 0 ];        then    export COLOR_GREEN="\033[0;32m";	fi
+      if [ ${#COLOR_ORANGE}     -eq 0 ];        then    export COLOR_ORANGE="\033[0;33m";	fi
+      if [ ${#COLOR_BLUE}	-eq 0 ];        then    export COLOR_BLUE="\033[0;34m";		fi
+      if [ ${#COLOR_PURPLE}     -eq 0 ];        then    export COLOR_PURPLE="\033[0;35m";	fi
+      if [ ${#COLOR_CYAN}	-eq 0 ];        then    export COLOR_CYAN="\033[0;36m";		fi
+      if [ ${#COLOR_LT_GRAY}	-eq 0 ];        then    export COLOR_LT_GRAY="\033[0;37m";	fi
+      if [ ${#COLOR_DK_GRAY}	-eq 0 ];        then    export COLOR_DK_GRAY="\033[1;30m";	fi
+      if [ ${#COLOR_LT_RED}     -eq 0 ];        then    export COLOR_LT_RED="\033[1;31m";	fi
+      if [ ${#COLOR_LT_GREEN}	-eq 0 ];        then    export COLOR_LT_GREEN="\033[1;32m";	fi
+      if [ ${#COLOR_YELLOW}     -eq 0 ];        then    export COLOR_YELLOW="\033[1;33m";	fi
+      if [ ${#COLOR_LT_BLUE}	-eq 0 ];        then    export COLOR_LT_BLUE="\033[1;34m";	fi
+      if [ ${#COLOR_LT_PURPLE}	-eq 0 ];        then    export COLOR_LT_PURPLE="\033[1;35m";	fi
+      if [ ${#COLOR_LT_CYAN}	-eq 0 ];        then    export COLOR_LT_CYAN="\033[1;36m";	fi
+      if [ ${#COLOR_WHITE}	-eq 0 ];        then    export COLOR_WHITE="\033[1;37m";	fi
+      if [ $BOL_VERBOSE -eq $TRUE ] && [ $BOL_DEBUG -eq $TRUE ] && [ $BOL_QUIET -eq $FALSE ]; then echo -e $COLOR_LT_BLUE"Enabling "$COLOR_YELLOW"Colorized Text Output"$COLOR_NORMAL; fi
+      ;;
+    *)
+      export	COLOR_SUPPORT=$FALSE
+      export	FUNCTION_RETURN=$FAILURE
+      unset	COLOR_NORMAL
+      unset	COLOR_BLACK
+      unset	COLOR_RED
+      unset	COLOR_GREEN
+      unset	COLOR_ORANGE
+      unset	COLOR_BLUE
+      unset	COLOR_PURPLE
+      unset	COLOR_CYAN
+      unset	COLOR_LT_GRAY
+      unset	COLOR_DK_GRAY
+      unset	COLOR_LT_RED
+      unset	COLOR_LT_GREEN
+      unset	COLOR_YELLOW
+      unset	COLOR_LT_BLUE
+      unset	COLOR_LT_PURPLE
+      unset	COLOR_LT_CYAN
+      unset	COLOR_WHITE
+      ;;
+  esac
+  if [ $BOL_FORCE_COLOR -eq $TRUE ]; then
+    export TERM="$TEMP_TERM"
+    unset TEMP_TERM
+  fi
+  return $FUNCTION_RETURN
+};
+
+function INIT_COLOR_SHORTHAND()
+{
+  if [ ${#COLOR_SUPPORT}	-eq 0 ]; then INIT_COLOR; fi
+  if [ ${#COLOR_NORMAL}         -ne 0 ]; then export CN="$COLOR_NORMAL";        else export CN=' ';     fi
+  if [ ${#COLOR_BLACK}          -ne 0 ]; then export CK="$COLOR_BLACK";         else export CK=' ';     fi
+  if [ ${#COLOR_RED}            -ne 0 ]; then export CR="$COLOR_RED";           else export CR=' ';     fi
+  if [ ${#COLOR_GREEN}          -ne 0 ]; then export CG="$COLOR_GREEN";         else export CG=' ';     fi
+  if [ ${#COLOR_ORANGE}         -ne 0 ]; then export CO="$COLOR_ORANGE";        else export CO=' ';     fi
+  if [ ${#COLOR_BLUE}           -ne 0 ]; then export CB="$COLOR_BLUE";          else export CB=' ';     fi
+  if [ ${#COLOR_PURPLE}         -ne 0 ]; then export CP="$COLOR_PURPLE";        else export CP=' ';     fi
+  if [ ${#COLOR_CYAN}           -ne 0 ]; then export CC="$COLOR_CYAN";          else export CC=' ';     fi
+  if [ ${#COLOR_YELLOW}		-ne 0 ]; then export CY="$COLOR_YELLOW";	else export CY=' ';	fi
+  if [ ${#COLOR_WHITE}          -ne 0 ]; then export CW="$COLOR_WHITE";         else export CW=' ';     fi
+  if [ ${#COLOR_LT_GRAY}        -ne 0 ]; then export CLA="$COLOR_LT_GRAY";      else export CLA=' ';    fi
+  if [ ${#COLOR_LT_RED}         -ne 0 ]; then export CLR="$COLOR_LT_RED";       else export CLR=' ';    fi
+  if [ ${#COLOR_LT_PURPLE}      -ne 0 ]; then export CLP="$COLOR_LT_PURPLE";    else export CLP=' ';    fi
+  if [ ${#COLOR_LT_CYAN}        -ne 0 ]; then export CLC="$COLOR_LT_CYAN";      else export CLC=' ';    fi
+  if [ ${#COLOR_LT_BLUE}	-ne 0 ]; then export CLB="$COLOR_LT_BLUE";	else export CLB=' ';	fi
+  if [ ${#COLOR_LT_GREEN}	-ne 0 ]; then export CLG="$COLOR_LT_GREEN";	else export CLG=' ';	fi
+  if [ ${#COLOR_DK_GRAY}        -ne 0 ]; then export CDA="$COLOR_DK_GRAY";      else export CDA=' ';    fi
+  return $SUCCESS
+};
+
+function CHECK_COLOR_SUPPORT()
+{
+  declare -i FUNCTION_RETURN=$FAILURE
+  if [ ${#COLOR_SUPPORT} -ne 0 ]; then
+    if [ $COLOR_SUPPORT -eq $TRUE ]; then FUNCTION_RETURN=$SUCCESS; fi
+  fi
+  return $FUNCTION_RETURN
+};
+
+# Print Date and Time
+function SHOW_DATE_TIME()
+{
+  CHECK_COLOR_SUPPORT
+  if [ $? -eq $SUCCESS ]; then
+    printf "%b[ %10s @ %5s ] %b" $COLOR_LT_GREEN $(date +%F) $(date +%R) $COLOR_NORMAL
+  else
+    printf "[ %10s @ %5s ] " $(date +%F) $(date +%R)
+  fi
+  return $SUCCESS
+};
+
+function CHECK_CMD_LINE()
+{
+  if [ $CMD_LINE_COUNT -eq 0 ]; then
+    echo -e $COLOR_LT_GREEN"$RUN_CMD"$COLOR_LT_BLUE"\tVersion: $VERSION"$COLOR_LT_GREEN"\nUsage:"$COLOR_LT_BLUE" $RUN_CMD [options] --help\n"$COLOR_NORMAL
+    exit $SUCCESS
+  fi
+  return $SUCCESS
+};
+
+function REQUIRE_ROOT_USER()
+{
+  if [ $(id -u) -gt 0 ]; then
+    echo -e $COLOR_LT_GREEN"$RUN_CMD"$COLOR_LT_BLUE"\tVersion: $VERSION\n"$COLOR_YELLOW"Must be ran as root"$COLOR_NORMAL
+    exit $FAILURE
+  fi
+  return $SUCCESS
+};
+
+function REQUIRE_NON_ROOT_USER()
+{
+  if [ $(id -u) -eq 0 ]; then
+    echo -e $COLOR_LT_GREEN"$RUN_CMD"$COLOR_LT_BLUE"\tVersion: $VERSION\n"$COLOR_YELLOW"Cannot be ran as root"$COLOR_NORMAL
+    exit $FAILURE
+  fi
+  return $SUCCESS
+};
+
+function CHECK_ROOT_USER()
+{
+  CHECK_COLOR_SUPPORT
+  if [ $? -eq $SUCCESS ]; then
+    if [ $(id -u) -eq 0 ]; then
+      if [ $BOL_ENABLE_ROOT -eq $FALSE ]; then
+        SHOW_DATE_TIME; echo -e $COLOR_LT_GREEN"$RUN_CMD"$COLOR_LT_BLUE"\tVersion: $VERSION\n"$COLOR_YELLOW"[WARNING] "$COLOR_CYAN"Shouldn't be ran as root! Use "$COLOR_LT_BLUE"--enable-root"$COLOR_CYAN" to bypass this safty check."$COLOR_NORMAL"\n\n"
+        exit $SUCCESS
+      else
+        SHOW_DATE_TIME; echo -e $COLOR_LT_GREEN"$RUN_CMD"$COLOR_LT_BLUE"\tVersion: $VERSION\n"$COLOR_YELLOW"[WARNING] "$COLOR_CYAN"Enabled root user"$COLOR_NOTMAL"\n\n"
+      fi
+    fi
+  else
+    if [ $(id -u) -eq 0 ]; then
+      if [ $BOL_ENABLE_ROOT -eq $FALSE ]; then
+        echo -e "$RUN_CMD\tVersion: $VERSION\n[WARNING] Shouldn't be ran as root! Use --enable-root to bypass this safty check.\n\n"
+        exit $SUCCESS
+      else
+        echo -e "$RUN_CMD\tVersion: $VERSION\n[WARNING] Enabled root user\n\n"
+      fi
+    fi
+  fi
+  return $SUCCESS
+};
+
+function LOG_RESULTS()
+{
+  if	[ ${#COLOR_SUPPORT} -eq 0 ]; then declare -i COLOR_SUPPORT=$FALSE; fi
+  if	[ ${#COMMAND} -gt 0 ] && [ ${#EXT_OPT} -eq 0 ]; then export DATA="$COMMAND"
+  elif	[ ${#EXT_OPT} -gt 0 ] && [ ${#COMMAND} -eq 0 ]; then export DATA="$EXT_OPT"
+  elif	[ ${#COMMAND} -gt 0 ] && [ ${#EXT_OPT} -gt 0 ]; then export DATA="$COMMAND $EXT_OPT"
+  else export DATA='*'; fi
+  if [ $COLOR_SUPPORT -eq $TRUE ]; then
+    if [ $RETVAL -eq $SUCCESS ]; then
+      printf "%b%s%b " $COLOR_YELLOW "$DATA" $COLOR_GREEN; log_success_msg "Success!"; printf "%b" $COLOR_NORMAL
+    else
+      printf "%b%s%b " $COLOR_YELLOW "$DATA" $COLOR_RED; log_failure_msg "Failure!"; printf "%b" $COLOR_NORMAL
+    fi
+  else
+    if [ $RETVAL -eq $SUCCESS ]; then
+      printf "%s " "$DATA"; log_success_msg "Success!"
+    else
+      printf "%s " "$DATA"; log_failure_msg "Failure!"
+    fi
+  fi
+  unset DATA
+  return $RETVAL
+};
+
+if [ ${#HELP_ARRAY[@]} -eq 0 ]; then
+  declare -ag HELP_ARRAY=();
+fi
+
+function DO_HELP()
+{
+  declare -i INDEX=-1
+  declare -i TEMP_LEN=0
+  declare -i SWITCH_LEN=0
+  declare -i COMMAND_LEN=0
+
+  echo -e $COLOR_LT_GREEN"$RUN_CMD"$COLOR_YELLOW"\tVersion: $VERSION"$COLOR_LT_BLUE"\nUsage: $RUN_CMD [options]\n"$COLOR_NORMAL
+
+  # First nested loop to get longest string length of both "switch" and "command"
+  while IFS= read LINE; do
+    INDEX=-1
+    unset COMMAND
+    unset SWITCH
+    for DATA in $LINE; do
+      ((INDEX++))
+      if [ $INDEX -eq 0 ]; then
+        SWITCH="$DATA"
+        TEMP_LEN=${#SWITCH}
+        if [ $TEMP_LEN -gt $SWITCH_LEN ]; then SWITCH_LEN=$((TEMP_LEN)); fi
+      else
+	COMMAND="$COMMAND $DATA"
+	TEMP_LEN=${#COMMAND}
+	if [ $TEMP_LEN -gt $COMMAND_LEN ]; then COMMAND_LEN=$((TEMP_LEN)); fi
+      fi
+    done
+    unset DATA
+  done < <(echo -e ${HELP_ARRAY[@]})
+
+  # Second nested loop to display the help messages
+  while IFS= read LINE; do
+    INDEX=-1
+    unset COMMAND
+    unset SWITCH
+    for DATA in $LINE; do
+      ((INDEX++))
+      if [ $INDEX -eq 0 ]; then
+        SWITCH="$DATA"
+      else
+        COMMAND="$COMMAND $DATA"
+      fi
+    done
+    unset DATA
+    printf "%b%-$((SWITCH_LEN+1))s%b: %b%-$((COMMAND_LEN+1))s%b\n" $COLOR_LT_GREEN "$SWITCH" $COLOR_NORMAL $COLOR_YELLOW "$COMMAND" $COLOR_NORMAL
+  done < <(echo -e ${HELP_ARRAY[@]})
+  echo -e "\n"
+  exit $SUCCESS
+};
+
+function STANDARD_CMD_LINE_OPTIONS()
+{
+  declare -ag OPTION_ARRAY=();
+  declare -i CMDLINE_COUNT=0
+  for i in ${CMDLINE[@]}; do
+    ((CMDLINE_COUNT++))
+    case $i in
+      '--check')
+	export BOL_CHECK=$TRUE
+	;;
+      '--no-wait')
+	export BOL_WAIT=$FALSE
+	;;
+      '-h' | '--help')
+	export BOL_HELP=$TRUE
+	export BOL_START=$FALSE
+	export BOL_STOP=$FALSE
+	;;
+      '-v' | '--verbose')
+	export BOL_VERBOSE=$TRUE
+	export VERBOSE="--verbose"
+	;;
+      '-q' | '--quiet')
+        export BOL_VERBOSE=$FALSE
+        export VERBOSE=""
+        ;;
+      '--debug')
+	export DEV_NULL="/dev/stdout"
+	export BOL_DEBUG=$TRUE
+	;;
+      'start')
+        export BOL_START=$TRUE
+	export BOL_STOP=$FALSE
+        ;;
+      'stop')
+	export BOL_START=$FALSE
+	export BOL_STOP=$TRUE
+	;;
+      'restart')
+	export BOL_STOP=$TRUE
+	export BOL_START=$TRUE
+	;;
+      '--version')
+	echo -e "$RUN_CMD\tVersion: $VERSION\nBy:\t\tPeter Talbott"
+	exit $SUCCESS
+	;;
+      '--bw')
+	export BOL_COLOR=$FALSE
+	;;
+      '--color')
+	export BOL_COLOR=$TRUE
+	;;
+      *)
+	OPTION_ARRAY_COUNT=${#OPTION_ARRAY[@]}
+        OPTION_ARRAY[$((OPTION_ARRAY_COUNT))]="$i"
+	;;
+    esac
+  done
+  return $CMDLINE_COUNT
+};
+
