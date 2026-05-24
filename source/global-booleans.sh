@@ -7,8 +7,8 @@
 # Revised 2020-07-21 PDT
 
 # Define TRUE/FALSE Variables
-if [ ${#TRUE}		 -eq 0 ];	then	declare -ig TRUE=1;			fi
-if [ ${#FALSE}		 -eq 0 ];	then	declare -ig FALSE=0;			fi
+if [ ${#TRUE}		   -eq 0 ];	then	/bin/true;  declare -ig TRUE=$?;			fi
+if [ ${#FALSE}		 -eq 0 ];	then	/bin/false; declare -ig FALSE=$?;			fi
 
 # Define SUCCESS/FAILURE Variables
 if [ ${#SUCCESS}	 -eq 0 ];	then	declare -ig SUCCESS=0;			fi
